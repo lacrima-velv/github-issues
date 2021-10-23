@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/issuesListFragment">
+
+    <fragment
+        android:id="@+id/issuesListFragment"
+        android:name="com.example.githubissues.issueslist.IssuesListFragment"
+        android:label="fragment_issues_list"
+        tools:layout="@layout/fragment_issues_list" >
+        <action
+            android:id="@+id/action_issuesListFragment_to_issueDetailFragment"
+            app:destination="@id/issueDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/issueDetailFragment"
+        android:name="com.example.githubissues.issuedetail.IssueDetailFragment"
+        android:label="fragment_issue_detail"
+        tools:layout="@layout/fragment_issue_detail" >
+        <action
+            android:id="@+id/action_issueDetailFragment_to_issuesListFragment"
+            app:destination="@id/issuesListFragment" />
+        <argument
+            android:name="issueId"
+            app:argType="long" />
+    </fragment>
+</navigation>
