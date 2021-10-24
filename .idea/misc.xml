@@ -4,19 +4,24 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/drawable/ic_round_list_alt_24.xml" value="0.2225" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout-land/activity_main.xml" value="0.28541666666666665" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout-land/experimental.xml" value="0.28541666666666665" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout-land/fragment_issues_list.xml" value="0.2" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/activity_main.xml" value="0.1703125" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/error_retry_btn_view.xml" value="0.35208333333333336" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/error_retry_view.xml" value="0.35208333333333336" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/error_text_view.xml" value="0.2942708333333333" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/error_view.xml" value="0.35208333333333336" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/fragment_issue_detail.xml" value="0.5" />
-        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/fragment_issues_list.xml" value="0.19382022471910113" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/fragment_issues_list.xml" value="0.25" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/issue_details.xml" value="0.35208333333333336" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/issue_element.xml" value="0.5" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/issue_item.xml" value="0.5" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/issue_item2.xml" value="0.215625" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/issues_load_state_footer_header_view_item.xml" value="0.34739583333333335" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/progress_view.xml" value="0.35208333333333336" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2325" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.2325" />
       </map>
     </option>
   </component>

@@ -8,6 +8,7 @@
     tools:context=".issueslist.IssuesListFragment">
 
     <com.google.android.material.tabs.TabLayout
+        style="@style/TabBar"
         android:id="@+id/tab_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -18,24 +19,22 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="All" />
+            android:text="@string/tab_all" />
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Opened" />
+            android:text="@string/tab_open" />
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Closed" />
-
-
+            android:text="@string/tab_closed" />
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swiperefresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="@dimen/tab_bar_height"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -55,8 +54,8 @@
 
     <ImageView
         android:id="@+id/empty_list_placeholder_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/empty_list_placeholder_image_width"
+        android:layout_height="@dimen/empty_list_placeholder_image_height"
         android:src="@drawable/ic_empty_list"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/empty_list_placeholder_text"
@@ -68,13 +67,12 @@
         tools:visibility="visible" />
 
     <TextView
+        style="@style/IssueListPlaceholderText"
         android:id="@+id/empty_list_placeholder_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-        android:text="There are currently no issues"
+        android:text="@string/placeholder_no_issues"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

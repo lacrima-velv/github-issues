@@ -32,7 +32,6 @@ import timber.log.Timber
 class IssuesListFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
-    //private lateinit var repository: GithubRepository
     private lateinit var binding: FragmentIssuesListBinding
     private lateinit var issuesPagingAdapter: IssuesPagingAdapter
     private lateinit var errorRetryViewBinding: ErrorRetryViewBinding
@@ -42,13 +41,13 @@ class IssuesListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel = ViewModelProvider(this, Injection.provideViewModelFactory(
-            context = requireActivity()
-        )).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(
+            this, Injection.provideViewModelFactory(
+            context = requireActivity(), owner = this
+            )
+        ).get(MainViewModel::class.java)
 
         binding = FragmentIssuesListBinding.inflate(inflater, container, false)
-
-
 
         // We need to bind the root layout with our binder for external layout
         errorRetryViewBinding = ErrorRetryViewBinding.bind(binding.root)
@@ -57,11 +56,6 @@ class IssuesListFragment : Fragment() {
         val onIssueClick = { issueId: Long ->
             val action = IssuesListFragmentDirections.actionIssuesListFragmentToIssueDetailFragment(issueId)
             findNavController().navigate(action)
-        }
-
-        viewModel.chosenIssueState.observe(viewLifecycleOwner) {
-           Timber.d("Chosen issue state is ${viewModel.chosenIssueState.value}")
-
         }
 
         issuesPagingAdapter = IssuesPagingAdapter(onIssueClick)
@@ -106,11 +100,14 @@ class IssuesListFragment : Fragment() {
             header = header,
             footer = footer
         )
-
+        bindChooseState(
+            uiState = uiState,
+            onIssueStateChosen = uiActions
+        )
         bindList(
-            //header = header,
             issuesPagingAdapter = issuesPagingAdapter,
-            uiState = uiState
+            uiState = uiState,
+            onScrollChanged = uiActions
         )
     }
 
@@ -120,14 +117,13 @@ class IssuesListFragment : Fragment() {
     ) {
         binding.tabBar.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                val tabText = tab?.text
-                val chosenState = when (tabText) {
-                    "All" -> IssueState.ALL
-                    "Closed" -> IssueState.CLOSED
-                    "Opened" -> IssueState.OPEN
-                    else -> IssueState.ALL
+                val chosenState = when (tab?.text) {
+                    getString(R.string.tab_all) -> IssueState.ALL.state
+                    getString(R.string.tab_closed) -> IssueState.CLOSED.state
+                    getString(R.string.tab_open) -> IssueState.OPEN.state
+                    else -> IssueState.ALL.state
                 }
-                viewModel.changeIssueState(chosenState)
+                updateIssuesListByChoosingState(chosenState, onIssueStateChosen)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -140,8 +136,6 @@ class IssuesListFragment : Fragment() {
 
         })
 
-        onIssueStateChosen(UiAction.ChooseIssueState(viewModel.chosenIssueState.value ?: IssueState.ALL))
-
         viewLifecycleOwner.lifecycleScope.launch {
             uiState
                 .map { it.issueState }
@@ -150,84 +144,114 @@ class IssuesListFragment : Fragment() {
         }
     }
 
+    private fun FragmentIssuesListBinding.updateIssuesListByChoosingState(
+        chosenState: String,
+        onIssueStateChosen: (UiAction.ChooseIssueState) -> Unit
+    ) {
+        issuesList.scrollToPosition(0)
+        onIssueStateChosen(UiAction.ChooseIssueState(chosenState))
+    }
+
     private fun FragmentIssuesListBinding.bindList(
         //  header: IssuesLoadStateAdapter,
         issuesPagingAdapter: IssuesPagingAdapter,
         uiState: StateFlow<UiState>,
+        onScrollChanged: (UiAction.Scroll) -> Unit
         //onIssueStateChosen: (UiAction.ChooseIssueState) -> Unit
     ) {
         errorRetryViewBinding.retryButton.setOnClickListener { issuesPagingAdapter.retry() }
+
+        issuesList.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy != 0) onScrollChanged(UiAction.Scroll(currentIssueState = uiState.value.issueState))
+            }
+        })
+
+        val notLoading = issuesPagingAdapter.loadStateFlow
+            // Only emit when REFRESH LoadState for RemoteMediator changes.
+            .distinctUntilChangedBy { it.refresh }
+            // Only react to cases where Remote REFRESH completes i.e., NotLoading.
+            .map { it.refresh is LoadState.NotLoading }
+
+        val hasNotScrolledForCurrentState = uiState
+            .map { it.hasNotScrolledForCurrentState }
+            .distinctUntilChanged()
+
+        val shouldScrollToTop = combine(
+            notLoading,
+            hasNotScrolledForCurrentState,
+            Boolean::and
+        )
+            .distinctUntilChanged()
 
         val pagingData = uiState
             .map { it.pagingData }
             .distinctUntilChanged()
 
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                issuesPagingAdapter.loadStateFlow.collect { loadState ->
-                    val isListEmpty = loadState.refresh is LoadState.NotLoading
-                            && issuesPagingAdapter.itemCount == 0
-                    // Show empty list
-                    emptyListPlaceholderText.isVisible = isListEmpty
-                    emptyListPlaceholderImage.isVisible = isListEmpty
-                    // Only show the list if refresh succeeds, either from the the local db or the remote.
-                    issuesList.isVisible = loadState.source.refresh is LoadState.NotLoading ||
-                            loadState.mediator?.refresh is LoadState.NotLoading
-                    // Show loading spinner during initial load or refresh
-                    progressViewBinding.progressBar.isVisible = loadState.mediator?.refresh is
-                            LoadState.Loading && swiperefresh.isRefreshing == false
-                    // Show the retry state if initial load or refresh fails
-                    errorRetryViewBinding.errorMsg.isVisible = loadState.mediator?.refresh is
-                            LoadState.Error && issuesPagingAdapter.itemCount == 0
+        viewLifecycleOwner.lifecycleScope.launch {
+            issuesPagingAdapter.loadStateFlow.collect { loadState ->
+                val isListEmpty = loadState.refresh is LoadState.NotLoading
+                        && issuesPagingAdapter.itemCount == 0
+                // Show empty list
+                emptyListPlaceholderText.isVisible = isListEmpty
+                emptyListPlaceholderImage.isVisible = isListEmpty
+                // Only show the list if refresh succeeds, either from the the local db or the remote.
+                issuesList.isVisible = loadState.source.refresh is LoadState.NotLoading ||
+                        loadState.mediator?.refresh is LoadState.NotLoading
+                // Show loading spinner during initial load or refresh
+                progressViewBinding.progressBar.isVisible = loadState.mediator?.refresh is
+                        LoadState.Loading && swiperefresh.isRefreshing == false
+                // Show the retry state if initial load or refresh fails
+                errorRetryViewBinding.errorMsg.isVisible = loadState.mediator?.refresh is
+                        LoadState.Error && issuesPagingAdapter.itemCount == 0
 
-                    errorRetryViewBinding.retryButton.isVisible = loadState.mediator?.refresh is
-                            LoadState.Error && issuesPagingAdapter.itemCount == 0
+                errorRetryViewBinding.retryButton.isVisible = loadState.mediator?.refresh is
+                        LoadState.Error && issuesPagingAdapter.itemCount == 0
 
-                    if (loadState.mediator?.refresh is LoadState.NotLoading ||
-                        loadState.mediator?.refresh is LoadState.Error
-                    ) {
-                        swiperefresh.isRefreshing = false
-                    }
-
-                    //TODO: Maybe I should delete it later
-                    val errorState = loadState.mediator?.append as? LoadState.Error
-                        ?: loadState.mediator?.prepend as? LoadState.Error
-                        ?: loadState.append as? LoadState.Error
-                        ?: loadState.prepend as? LoadState.Error
-                    errorState?.let {
-                        Toast.makeText(
-                            requireActivity(),
-                            it.error.message.toString(),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
+                if (loadState.mediator?.refresh is LoadState.NotLoading ||
+                    loadState.mediator?.refresh is LoadState.Error
+                ) {
+                    swiperefresh.isRefreshing = false
                 }
+
+                //TODO: Maybe I should delete it later
+                val errorState = loadState.mediator?.append as? LoadState.Error
+                    ?: loadState.mediator?.prepend as? LoadState.Error
+                    ?: loadState.append as? LoadState.Error
+                    ?: loadState.prepend as? LoadState.Error
+                errorState?.let {
+                    Toast.makeText(
+                        requireActivity(),
+                        it.error.message.toString(),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
             }
-
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            viewModel.openList(issueState = IssueState.ALL).collectLatest { pagingData ->
-//                issuesPagingAdapter.submitData(pagingData)
-//            }
-//        }
-
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                pagingData
-                    .distinctUntilChanged()
-                    .collectLatest { pagingData ->
-                        issuesPagingAdapter.submitData(pagingData)
-                    }
-            }
-
-
         }
 
-//    private fun FragmentIssuesListBinding.updateIssuesListByChoosingState(
-//        onIssueStateChosen: (UiAction.ChooseIssueState) -> Unit
-//    ) {
-//        onIssueStateChosen(UiAction.ChooseIssueState(viewModel.chosenIssueState.value ?: IssueState.ALL))
-//    }
+        viewLifecycleOwner.lifecycleScope.launch {
+            combine(shouldScrollToTop, pagingData,::Pair)
+                /*
+                Each unique PagingData should be submitted once, take the latest from
+                shouldScrollToTop
+                */
+                .distinctUntilChanged()
+                .collectLatest { (shouldScroll, pagingData) ->
+                    issuesPagingAdapter.submitData(pagingData)
+                    /*
+                    Scroll only after the data has been submitted to the adapter,
+                    and is a fresh issue state
+                     */
+                    if (shouldScroll) issuesList.scrollToPosition(0)
+                }
+        }
+
+
+    }
+
+
 
 
 

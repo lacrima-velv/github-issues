@@ -16,18 +16,19 @@ interface IssuesDao {
     Instead of returning a List<Issue>, return PagingSource<Int, Issue>.
     That way, the issues table becomes the source of data for Paging
      */
-//    @Query("SELECT id, userLogin, number, title, state, updatedAt, closedAt " +
-//            "FROM issues WHERE state = :issueState ORDER BY updatedAt DESC")
-//    fun getAllIssuesNoDetails(issueState: String): PagingSource<Int, Issue>
-
-    @Query("SELECT * FROM issues WHERE state = :state ORDER BY updatedAt DESC")
+    @Query("SELECT id, userLogin, number, title, state, updatedAt, closedAt " +
+            "FROM issues WHERE state = :state ORDER BY updatedAt DESC")
     fun getAllIssuesNoDetails(state: String): PagingSource<Int, Issue>
 
-    @Query("SELECT * FROM issues ORDER BY updatedAt DESC")
+    @Query("SELECT id, userLogin, number, title, state, updatedAt, closedAt " +
+            "FROM issues ORDER BY updatedAt DESC")
     fun getAllIssuesNoDetailsAllStates(): PagingSource<Int, Issue>
 
     @Query("SELECT * FROM issues WHERE id = :id")
     suspend fun getIssueDetailsById(id: Long): Issue
+
+    @Query("DELETE FROM issues WHERE state = :state")
+    suspend fun clearIssuesWithState(state: String)
 
     @Query("DELETE FROM issues")
     suspend fun clearIssues()

@@ -26,10 +26,11 @@ class GithubRepository(
     Each refresh of data will have a separate corresponding PagingData
      */
     @OptIn(ExperimentalPagingApi::class)
-    fun getIssues(issueState: IssueState): Flow<PagingData<Issue>> {
+    fun getIssues(issueState: String): Flow<PagingData<Issue>> {
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
+                initialLoadSize = INITIAL_LOAD_SIZE,
                 prefetchDistance = PREFETCH_DISTANCE,
                 // By default PagingConfig.maxSize is unbounded, so pages are never dropped
                 maxSize = NETWORK_PAGE_SIZE + PREFETCH_DISTANCE * 2,
@@ -41,9 +42,9 @@ class GithubRepository(
                 issueState
             ),
             pagingSourceFactory = {
-                Timber.d("Create pagingSourceFactory. issueState.state is ${issueState.state}")
-                if (issueState.state != IssueState.ALL.state) {
-                    database.issuesDao().getAllIssuesNoDetails(issueState.state)
+                Timber.d("Create pagingSourceFactory. issueState.state is $issueState")
+                if (issueState != IssueState.ALL.state) {
+                    database.issuesDao().getAllIssuesNoDetails(issueState)
                 } else {
                     database.issuesDao().getAllIssuesNoDetailsAllStates()
                 }
@@ -59,5 +60,6 @@ class GithubRepository(
     companion object {
         const val NETWORK_PAGE_SIZE = 50
         const val PREFETCH_DISTANCE = 50
+        const val INITIAL_LOAD_SIZE = NETWORK_PAGE_SIZE
     }
 }

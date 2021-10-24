@@ -20,7 +20,7 @@ private const val GITHUB_STARTING_PAGE_INDEX = 1
 class GithubRemoteMediator(
     private val service: GithubApiService,
     private val issuesDatabase: IssuesDatabase,
-    private val issueState: IssueState
+    private val issueState: String
 ) : RemoteMediator<Int, Issue>() {
     override suspend fun load(loadType: LoadType, state: PagingState<Int, Issue>): MediatorResult {
         val page = when (loadType) {
@@ -61,23 +61,36 @@ class GithubRemoteMediator(
         }
 
         try {
-            val apiResponse = service.getIssues(issueState.state, page, state.config.pageSize)
+            val apiResponse = service.getIssues(issueState, page, state.config.pageSize)
 
-            val issues = apiResponse
-            val endOfPaginationReached = issues.isEmpty()
+            val endOfPaginationReached = apiResponse.isEmpty()
             issuesDatabase.withTransaction {
-                // Clear all tables in the database
+                // Clear just keys for issues which are currently displayed
                 if (loadType == LoadType.REFRESH) {
-                    issuesDatabase.remoteKeysDao().clearRemoteKeys()
-                    issuesDatabase.issuesDao().clearIssues()
+                    if (issueState == IssueState.ALL.state) {
+                        issuesDatabase.remoteKeysDao().clearRemoteKeys()
+                    } else {
+                        issuesDatabase.remoteKeysDao().clearRemoteKeysWithIssueState(issueState)
+                    }
+                    // Clear just issues which are currently displayed
+                    if (issueState == IssueState.ALL.state) {
+                        issuesDatabase.issuesDao().clearIssues()
+                    } else {
+                        issuesDatabase.issuesDao().clearIssuesWithState(issueState)
+                    }
                 }
                 val prevKey = if (page == GITHUB_STARTING_PAGE_INDEX) null else page - 1
                 val nextKey = if (endOfPaginationReached) null else page + 1
-                val keys = issues.map {
-                    RemoteKeys(issueId = it.id, prevKey = prevKey, nextKey = nextKey)
+                val keys = apiResponse.map {
+                    RemoteKeys(
+                        issueId = it.id,
+                        prevKey = prevKey,
+                        nextKey = nextKey,
+                        issueState = issueState
+                    )
                 }
                 issuesDatabase.remoteKeysDao().insertAll(keys)
-                issuesDatabase.issuesDao().insertAll(issues)
+                issuesDatabase.issuesDao().insertAll(apiResponse)
             }
             return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         } catch (exception: IOException) {

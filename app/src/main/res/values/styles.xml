@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TabBar">
+        <item name="android:background">@color/orange_medium</item>
+        <item name="tabIndicatorColor">@color/black</item>
+        <item name="tabSelectedTextColor">@color/black</item>
+    </style>
+    <style name="IssueDescriptionText">
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body1</item>
+    </style>
+    <style name="IssueMetadataText">
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body2</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="IssueTitleText">
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Headline6</item>
+    </style>
+    <style name="IssueListPlaceholderText">
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body2</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+    <style name="IssueListTitleText">
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Headline6</item>
+    </style>
+    <style name="IssueListMetadataText">
+    <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body2</item>
+    </style>
+</resources>

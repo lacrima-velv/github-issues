@@ -6,9 +6,11 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.githubissues.DateTimeFormatter.getRelativeTime
+import com.example.githubissues.R
 import com.example.githubissues.databinding.IssueItemBinding
 import com.example.githubissues.model.Issue
 import timber.log.Timber
+import java.util.*
 
 /*
 The PagingDataAdapter listens to internal PagingData loading events as pages are loaded and uses
@@ -20,6 +22,7 @@ class IssuesPagingAdapter(private val onClick: (Long) -> Unit) :
 
     inner class IssueItemViewHolder(private var binding: IssueItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        private val context = binding.root.context
         private val issueTitle = binding.issueTitle
         private val issueNumber = binding.issueNumber
         private val issueAuthor = binding.issueAuthor
@@ -27,17 +30,19 @@ class IssuesPagingAdapter(private val onClick: (Long) -> Unit) :
         private val issueState = binding.issueState
 
         fun bind(issue: Issue) {
-            Timber.d("Bind is called")
             issueTitle.text = issue.title
-            issueNumber.text = issue.number.toString()
+            issueNumber.text = context.getString(R.string.issue_number,issue.number)
             // TODO use Unknown in strings. Add by to strings
             issueAuthor.text = issue.user?.userLogin ?: "Unknown"
             // TODO convert date to "N days ago"
             //issueUpdatedDate.text = issue.updatedAt
             issueUpdatedDate.text = issue.updatedAt?.let { getRelativeTime(it) }
             // TODO add to strings "State: ..."
-            issueState.text = issue.state
-            Timber.d("Bind: issue.state is ${issue.state}")
+            issueState.text = context.getString(R.string.issue_state, issue.state.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(
+                    Locale.getDefault()
+                ) else it.toString()
+            })
 
             val issueId = issue.id
 

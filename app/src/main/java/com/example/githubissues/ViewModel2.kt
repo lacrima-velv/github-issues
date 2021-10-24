@@ -38,7 +38,7 @@ class MainViewModel2(
     }
 
     fun openList(issueState: IssueState): Flow<PagingData<Issue>> =
-        repository.getIssues(issueState)
+        repository.getIssues(issueState.state)
             .cachedIn(viewModelScope)
 
     fun getIssueDetails(issueId: Long) {

@@ -8,8 +8,13 @@
     <string name="updated">Updated:</string>
     <string name="created">Created:</string>
     <string name="issue_number">#%d</string>
-    <string name="unknown_lower_case">unknown</string>
-    <string name="unknown_upper_case">Unknown</string>
+    <string name="unknown">Unknown</string>
     <string name="no_description">No description</string>
     <string name="no_one_assignee">No one</string>
+    <string name="tab_all">All</string>
+    <string name="tab_open">Open</string>
+    <string name="tab_closed">Closed</string>
+    <string name="placeholder_no_issues">There are currently no issues</string>
+    <string name="something_went_wrong">Something went wrong. \nWe are already working on this issue.</string>
+    <string name="retry">Retry</string>
 </resources>

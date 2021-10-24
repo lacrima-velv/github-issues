@@ -2,6 +2,7 @@ package com.example.githubissues
 
 import android.content.Context
 import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.SavedStateRegistryOwner
 import com.example.githubissues.api.GithubApiService
 import com.example.githubissues.data.GithubRepository
 import com.example.githubissues.db.IssuesDatabase
@@ -25,8 +26,9 @@ object Injection {
      * Provides the [ViewModelProvider.Factory] that is then used to get a reference to
      * [ViewModel] objects.
      */
-    fun provideViewModelFactory(context: Context): ViewModelProvider.Factory {
-        return MainViewModelFactory(provideGithubRepository(context))
+    fun provideViewModelFactory(context: Context, owner: SavedStateRegistryOwner):
+            ViewModelProvider.Factory {
+        return MainViewModelFactory(owner, provideGithubRepository(context))
     }
 
 }

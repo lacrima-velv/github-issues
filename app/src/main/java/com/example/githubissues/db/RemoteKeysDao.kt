@@ -14,6 +14,9 @@ interface RemoteKeysDao {
     @Query("SELECT * FROM remote_keys WHERE issueId = :issueId")
     suspend fun getRemoteKeysByIssueId(issueId: Long): RemoteKeys?
 
+    @Query("DELETE FROM remote_keys WHERE issueState = :state")
+    suspend fun clearRemoteKeysWithIssueState(state: String)
+
     @Query("DELETE FROM remote_keys")
     suspend fun clearRemoteKeys()
 }

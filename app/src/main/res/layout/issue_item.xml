@@ -7,24 +7,24 @@
     android:paddingBottom="8dp">
 
     <TextView
+        style="@style/IssueListTitleText"
         android:id="@+id/issue_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+        android:layout_marginStart="@dimen/margin_on_sides"
+        android:layout_marginTop="@dimen/margin_on_sides"
+        android:layout_marginEnd="@dimen/margin_on_sides"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Throwing retrofit2.HttpException 500 Internal Server Error" />
 
     <TextView
+        style="@style/IssueListMetadataText"
         android:id="@+id/issue_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/margin_on_sides"
         app:layout_constraintEnd_toStartOf="@+id/issue_state"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,38 +32,62 @@
         tools:text="#1234" />
 
     <TextView
+        style="@style/IssueListMetadataText"
         android:id="@+id/issue_state"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="@dimen/margin_on_sides"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/issue_number"
         app:layout_constraintTop_toBottomOf="@+id/issue_title"
         tools:text="State: Open" />
 
     <TextView
+        style="@style/IssueListMetadataText"
+        android:id="@+id/issue_updated"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_on_sides"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/issue_number"
+        android:text="@string/updated" />
+
+    <TextView
+        style="@style/IssueListMetadataText"
         android:id="@+id/issue_updated_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-        android:layout_marginStart="16dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="@dimen/margin_on_sides"
+        app:layout_constraintStart_toEndOf="@id/issue_updated"
         app:layout_constraintTop_toBottomOf="@+id/issue_number"
-        tools:text="Updated: 12 days ago" />
+        tools:text="12 days ago" />
 
     <TextView
-        android:id="@+id/issue_author"
+        style="@style/IssueListMetadataText"
+        android:id="@+id/issue_posted_by"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="@dimen/margin_on_sides"
+        android:layout_marginEnd="@dimen/margin_on_sides"
         android:ellipsize="end"
         android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/issue_updated_date"
-        tools:text="Posted by Maxim Alexandrov" />
+        android:text="@string/posted_by" />
+
+    <TextView
+        style="@style/IssueListMetadataText"
+        android:id="@+id/issue_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_on_sides"
+        android:layout_marginEnd="@dimen/margin_on_sides"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/issue_posted_by"
+        app:layout_constraintTop_toBottomOf="@+id/issue_updated_date"
+        tools:text="Maxim Alexandrov" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

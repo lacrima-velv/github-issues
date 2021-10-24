@@ -1,15 +1,11 @@
 package com.example.githubissues.issuedetail
 
-import android.opengl.Visibility
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.view.isVisible
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -17,7 +13,6 @@ import coil.size.Precision
 import coil.size.Scale
 import coil.size.ViewSizeResolver
 import coil.transform.CircleCropTransformation
-import coil.transform.Transformation
 import com.example.githubissues.DateTimeFormatter.getRelativeTime
 import com.example.githubissues.Injection
 import com.example.githubissues.MainViewModel
@@ -25,6 +20,7 @@ import com.example.githubissues.R
 import com.example.githubissues.databinding.FragmentIssueDetailBinding
 import com.example.githubissues.model.Issue
 import timber.log.Timber
+import java.util.*
 
 class IssueDetailFragment : Fragment() {
 
@@ -39,9 +35,12 @@ class IssueDetailFragment : Fragment() {
         args = IssueDetailFragmentArgs.fromBundle(requireArguments())
         Timber.d("Got an issue id ${args.issueId}")
 
-        viewModel = ViewModelProvider(this, Injection.provideViewModelFactory(
-            context = requireActivity()
-        )).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(
+            this, Injection.provideViewModelFactory(
+            context = requireActivity(),
+            owner = this
+            )
+        ).get(MainViewModel::class.java)
 
         viewModel.getIssueDetails(args.issueId)
 
@@ -56,10 +55,16 @@ class IssueDetailFragment : Fragment() {
     }
 
     private fun FragmentIssueDetailBinding.bindUi(currentIssueDetails: Issue?) {
-        issueDetailsState.text = getString(R.string.issue_state, currentIssueDetails?.state ?: R.string.unknown_lower_case)
+        issueDetailsState.text = getString(
+            R.string.issue_state, currentIssueDetails?.state?.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase(
+                Locale.getDefault()
+            ) else it.toString()
+        } ?: R.string.unknown
+        )
         issueDetailsNumber.text = getString(R.string.issue_number, currentIssueDetails?.number)
-        issueDetailsTitle.text = currentIssueDetails?.title ?: getString(R.string.unknown_upper_case)
-        issueDetailsAuthor.text = currentIssueDetails?.user?.userLogin ?: getString(R.string.unknown_upper_case)
+        issueDetailsTitle.text = currentIssueDetails?.title ?: getString(R.string.unknown)
+        issueDetailsAuthor.text = currentIssueDetails?.user?.userLogin ?: getString(R.string.unknown)
 
         // Show Author's avatar only if we got his name
 //        if (currentIssueDetails?.user?.userLogin == null) {
@@ -78,9 +83,9 @@ class IssueDetailFragment : Fragment() {
         //issueDetailsAssigneeAvatar.isVisible = currentIssueDetails?.assignee?.assigneeLogin != null
 
         issueDetailsUpdatedDate.text = currentIssueDetails?.updatedAt?.
-            let { getRelativeTime(it) } ?: getString(R.string.unknown_lower_case)
+            let { getRelativeTime(it) } ?: getString(R.string.unknown)
         issueDetailsCreatedDate.text = currentIssueDetails?.createdAt?.
-            let { getRelativeTime(it) } ?: getString(R.string.unknown_lower_case)
+            let { getRelativeTime(it) } ?: getString(R.string.unknown)
 
         // Get Author's avatar
         getAvatar(issueDetailsAuthorAvatar, currentIssueDetails?.user?.userAvatarUrl)
