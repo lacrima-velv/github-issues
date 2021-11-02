@@ -1,36 +1,35 @@
 package com.example.githubissues.issueslist
 
-import android.content.Intent
-import android.net.Uri
+import android.app.Application
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.NavHostFragment
 import androidx.paging.LoadState
+import androidx.recyclerview.selection.*
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.example.githubissues.*
+import com.example.githubissues.R
 import com.example.githubissues.databinding.ErrorRetryViewBinding
 import com.example.githubissues.databinding.FragmentIssuesListBinding
 import com.example.githubissues.databinding.ProgressViewBinding
-import com.example.githubissues.model.Issue
 import com.example.githubissues.model.IssueState
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class IssuesListFragment : Fragment() {
 
+    private lateinit var viewModelFactory: MainViewModelFactory
     private lateinit var viewModel: MainViewModel
     private lateinit var binding: FragmentIssuesListBinding
     private lateinit var issuesPagingAdapter: IssuesPagingAdapter
@@ -40,25 +39,74 @@ class IssuesListFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        viewModel = ViewModelProvider(
-            this, Injection.provideViewModelFactory(
-            context = requireActivity(), owner = this
-            )
-        ).get(MainViewModel::class.java)
+    ): View {
+
+        viewModelFactory =  MainViewModelFactory(Application(), this)
+
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+
+        viewModel.isAnyIssueSelected.observe(viewLifecycleOwner) { }
 
         binding = FragmentIssuesListBinding.inflate(inflater, container, false)
+
+        val issuesListToolbarTitle = { (activity as MainActivity).changeToolbarTitle("Issues list") }
+        val issueDetailsToolbarTitle = { (activity as MainActivity).changeToolbarTitle("Issue Details") }
+
+
+
+        // Connect the SlidingPaneLayout to the system back button
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+            TwoPaneOnBackPressedCallback(
+                binding.slidingPaneLayout,
+                issuesListToolbarTitle,
+                issueDetailsToolbarTitle
+        )
+        )
+
 
         // We need to bind the root layout with our binder for external layout
         errorRetryViewBinding = ErrorRetryViewBinding.bind(binding.root)
         progressViewBinding = ProgressViewBinding.bind(binding.root)
 
+        val navHostFragment = childFragmentManager.findFragmentById(R.id.nav_host_fragment)
+                as NavHostFragment
+        val navController = navHostFragment.navController
+
+
         val onIssueClick = { issueId: Long ->
-            val action = IssuesListFragmentDirections.actionIssuesListFragmentToIssueDetailFragment(issueId)
-            findNavController().navigate(action)
+
+            viewModel.deselectLastSelectedIssue()
+
+            viewModel.setIssueSelected(issueId)
+
+            navController.navigate(
+                R.id.issueDetailFragment,
+                bundleOf("issueId" to issueId),
+                NavOptions.Builder()
+                    .setPopUpTo(navController.graph.startDestination, true)
+                    .apply {
+                        if (binding.slidingPaneLayout.isOpen) {
+                            setEnterAnim(androidx.navigation.ui.ktx.R.animator.nav_default_enter_anim)
+                            setExitAnim(androidx.navigation.ui.ktx.R.animator.nav_default_exit_anim)
+                        }
+                    }
+                    .build()
+            )
+            //viewModel.setIsAnyIssueSelectedToTrue()
+            binding.slidingPaneLayout.openPane()
+
         }
 
-        issuesPagingAdapter = IssuesPagingAdapter(onIssueClick)
+//        val onFirstDetailsOpened = { issue: Issue, view: View ->
+//            val width = resources.displayMetrics.widthPixels.toDp
+//            view.isActivated = issue.isSelected == 1
+//            Timber.d("onFirstDetailsOpened is called. width is $width and viewModel.isAnyIssueSelected.value is ${viewModel.isAnyIssueSelected.value}")
+//        }
+
+        issuesPagingAdapter = IssuesPagingAdapter(
+            onIssueClick,
+            //onFirstDetailsOpened
+        )
 
         // Save scrolling position when fragment is recreated
         issuesPagingAdapter.stateRestorationPolicy =
@@ -123,7 +171,10 @@ class IssuesListFragment : Fragment() {
                     getString(R.string.tab_open) -> IssueState.OPEN.state
                     else -> IssueState.ALL.state
                 }
+
                 updateIssuesListByChoosingState(chosenState, onIssueStateChosen)
+                //viewModel.deselectLastSelectedIssue()
+                //viewModel.setIsAnyIssueSelectedToFalse()
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -261,6 +312,8 @@ class IssuesListFragment : Fragment() {
             issuesPagingAdapter.refresh()
         }
     }
+
+
 
 
 
