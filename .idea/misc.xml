@@ -3,17 +3,26 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/drawable/ic_empty_list.xml" value="0.2135" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/drawable/ic_round_list_alt_24.xml" value="0.2225" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/drawable/issue_details_divider.xml" value="0.2135" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/drawable/item_selector.xml" value="0.181" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/drawable/selector.xml" value="0.279" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout-land/activity_main.xml" value="0.28541666666666665" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout-land/experimental.xml" value="0.28541666666666665" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout-land/fragment_issues_list.xml" value="0.2" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout-w600dp/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout-w600dp/fragment_issue_detail.xml" value="0.33" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout-w600dp/fragment_issues_list.xml" value="0.25" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout-w600dp/fragment_issues_list2.xml" value="0.25" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/activity_main.xml" value="0.1703125" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/error_retry_btn_view.xml" value="0.35208333333333336" />
-        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/error_retry_view.xml" value="0.35208333333333336" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/error_retry_view.xml" value="0.33" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/error_text_view.xml" value="0.2942708333333333" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/error_view.xml" value="0.35208333333333336" />
-        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/fragment_issue_detail.xml" value="0.5" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/fragment_issue_detail.xml" value="0.33" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/fragment_issues_list.xml" value="0.25" />
+        <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/fragment_issues_list2.xml" value="0.22" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/issue_details.xml" value="0.35208333333333336" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/issue_element.xml" value="0.5" />
         <entry key="..\:/Users/lacri/AndroidStudioProjects/GithubIssues/app/src/main/res/layout/issue_item.xml" value="0.5" />

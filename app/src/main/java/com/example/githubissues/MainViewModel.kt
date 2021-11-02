@@ -1,22 +1,28 @@
 package com.example.githubissues
 
+import android.app.Application
 import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.githubissues.data.GithubRepository
+import com.example.githubissues.data.UploadIssuesWorker
 import com.example.githubissues.model.Issue
 import com.example.githubissues.model.IssueState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainViewModel(
-    private val repository: GithubRepository,
+    application: Application,
     private val savedStateHandle: SavedStateHandle
-): ViewModel() {
+): AndroidViewModel(application), KoinComponent {
+
+    private val repo: GithubRepository by inject()
 
     /**
      * Stream of immutable states representative of the UI.
@@ -33,20 +39,24 @@ class MainViewModel(
     val currentIssueDetails: LiveData<Issue>
         get() = _currentIssueDetails
 
-    private val _chosenIssueState = MutableLiveData<String>()
-    val chosenIssueState: LiveData<String>
-        get() = _chosenIssueState
+    private val _isAnyIssueSelected = MutableLiveData<Boolean>()
+    val isAnyIssueSelected: LiveData<Boolean>
+        get() = _isAnyIssueSelected
 
-    fun changeIssueStateInUi(issueState: String) {
-        _chosenIssueState.value = issueState
-    }
 
-    init {
+        init {
+
+            UploadIssuesWorker.enqueueWork(getApplication())
+
+            _isAnyIssueSelected.value = false
+            //_isInitiallyNavigatedToDetails.value = false
+
         // Default value
        // _chosenIssueState.value = IssueState.ALL
         val initialIssueState: String = savedStateHandle.get(LAST_CHOSEN_ISSUE_STATE) ?: DEFAULT_ISSUE_STATE
         // It represents the last issue state whare the user has interacted with the list
         val lastIssueStateScrolled: String = savedStateHandle.get(LAST_ISSUE_STATE_SCROLLED) ?: DEFAULT_ISSUE_STATE
+
 
         val actionStateFlow = MutableSharedFlow<UiAction>()
 
@@ -82,6 +92,7 @@ class MainViewModel(
             to lose their place again
             */
             .onStart { emit(UiAction.Scroll(currentIssueState = lastIssueStateScrolled)) }
+
 
         state = issueStatesChanges
             /*
@@ -122,61 +133,6 @@ class MainViewModel(
                 initialValue = UiState()
             )
 
-//        state = actionStateFlow
-//            .filterIsInstance<UiAction.OpenList>()
-//            .distinctUntilChanged()
-//            /*
-//            Converts a cold Flow into a hot StateFlow that is started in the given coroutine scope,
-//            sharing the most recently emitted value from a single running instance of the upstream
-//            flow with multiple downstream subscribers
-//            */
-//            .shareIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-//                replay = 1
-//            )
-//            // Returns a flow that invokes the given action before this flow starts to be collected
-//            /*
-//             Also used for caching. If the app was killed, but the user had already
-//             scrolled through a state, we don't want to scroll the list to the top
-//             causing them to lose their place again.
-//            */
-//            .onStart { emit(UiAction.OpenList(chosenIssueState.value ?: IssueState.ALL.state))
-//                Timber.d("chosenIssueState inside view model is ${chosenIssueState.value}")
-//            }
-//            /*
-//            Use flatmapLatest operator, because each new issue state requires a new Pager to be
-//            created and therefore gets a new Flow<PagingData> as well
-//            */
-//            .flatMapLatest { openList ->
-//                openList(openList.issueState)
-//                    .map { pagingData ->
-//                        UiState(
-//                            issueState = openList.issueState,
-//                            pagingData = pagingData
-//                        )
-//                    }
-//            }
-////            .flatMapLatest {
-////                openList(chosenIssueState.value ?: IssueState.OPEN)
-////                    .map { pagingData ->
-////                        UiState(
-////                            issueState = chosenIssueState.value ?: IssueState.OPEN,
-////                            pagingData = pagingData
-////                        )
-////                    }
-////            }
-//            /*
-//            Converts a cold Flow into a hot StateFlow that is started in the given coroutine scope,
-//            sharing the most recently emitted value from a single running instance of the upstream
-//            flow with multiple downstream subscribers
-//            */
-//            .stateIn(
-//                scope = viewModelScope,
-//                // This start policy keeps the upstream producer active while there are active subscribers
-//                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-//                initialValue = UiState(chosenIssueState.value ?: IssueState.ALL.state)
-//            )
 
         accept = { action ->
             viewModelScope.launch { actionStateFlow.emit(action) }
@@ -184,18 +140,30 @@ class MainViewModel(
 
     }
 
-    // TODO: Probably will delete
-    private fun openList(issueState: String): Flow<PagingData<Issue>> =
-        repository.getIssues(issueState)
+    private fun changeIssueState(issueState: String): Flow<PagingData<Issue>> =
+        repo.getIssues(issueState)
             .cachedIn(viewModelScope)
 
-    private fun changeIssueState(issueState: String): Flow<PagingData<Issue>> =
-        repository.getIssues(issueState)
-            .cachedIn(viewModelScope)
+
 
     fun getIssueDetails(issueId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            _currentIssueDetails.postValue(repository.getIssueDetails(issueId))
+            _currentIssueDetails.postValue(repo.getIssueDetails(issueId))
+        }
+    }
+
+    fun deselectLastSelectedIssue() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.deselectLastSelectedIssue()
+        }
+    }
+
+
+    val setIssueSelected = { id: Long ->
+       // _lastSelectedItemId.postValue(id)
+        viewModelScope.launch(Dispatchers.IO) {
+            Timber.d("repository.setIssueSelected(id) returned ${repo.setIssueSelected(id)}")
+            repo.setIssueSelected(id)
         }
     }
 
@@ -205,10 +173,9 @@ class MainViewModel(
         super.onCleared()
     }
 }
+
 // Represents user's actions.
 sealed class UiAction {
-    //object OpenList : UiAction()
-    data class OpenList(val issueState: String) : UiAction() //TODO: Probably should delete
     // This let us to associate a scroll action with a particular state
     data class Scroll(val currentIssueState: String) : UiAction()
     data class ChooseIssueState(val issueState: String) : UiAction()
@@ -223,7 +190,6 @@ lastStateChosen and hasNotScrolledForCurrentState flags will prevent us from scr
 of the list when we shouldn't.
  */
 data class UiState(
-    //val hasNotScrolled: Boolean = false,
     val issueState: String = DEFAULT_ISSUE_STATE,
     val lastStateChosen: String = LAST_CHOSEN_ISSUE_STATE,
     val hasNotScrolledForCurrentState: Boolean = false,

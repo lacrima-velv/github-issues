@@ -8,5 +8,6 @@ data class RemoteKeys(
     @PrimaryKey val issueId: Long,
     val prevKey: Int?,
     val nextKey: Int?,
+    // TODO: Try to delete this field and use it from IssuesDao
     val issueState: String
 )

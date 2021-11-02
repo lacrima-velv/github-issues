@@ -6,6 +6,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.githubissues.api.GithubApiService
 import com.example.githubissues.db.IssuesDatabase
+import com.example.githubissues.db.RemoteKeys
 import com.example.githubissues.model.Issue
 import com.example.githubissues.model.IssueState
 import kotlinx.coroutines.flow.Flow
@@ -48,13 +49,60 @@ class GithubRepository(
                 } else {
                     database.issuesDao().getAllIssuesNoDetailsAllStates()
                 }
-                //database.issuesDao().getAllIssuesNoDetails()
             }
         ).flow
     }
 
     suspend fun getIssueDetails(issueId: Long): Issue {
        return database.issuesDao().getIssueDetailsById(issueId)
+    }
+
+    suspend fun deselectLastSelectedIssue() {
+        return database.issuesDao().deselectLastSelectedIssue()
+    }
+
+    suspend fun setIssueSelected(id: Long) {
+        Timber.d("database.issuesDao().setIssueSelected(id) returned ${database.issuesDao().setIssueSelected(id)}")
+        return database.issuesDao().setIssueSelected(id)
+    }
+
+    suspend fun checkIsIssueSelected(id: Long): Int {
+        Timber.d("database.issuesDao().checkIsIssueSelected(id) returned ${database.issuesDao().checkIsIssueSelected(id)}")
+        return database.issuesDao().checkIsIssueSelected(id)
+    }
+
+    private fun getNextPageKeyForWorker(pageNum: Int) =
+        when (pageNum) {
+            1 -> pageNum + 1 + (PREFETCH_DISTANCE / NETWORK_PAGE_SIZE)
+            else -> pageNum + 1
+        }
+
+    private fun getPreviousKeyForWorker(pageNum: Int) =
+        when (pageNum) {
+            1 -> null
+            else -> pageNum - 1
+        }
+
+
+    suspend fun getIssuesByWorkManager() {
+        val numberOfPages = (NETWORK_PAGE_SIZE + PREFETCH_DISTANCE) / NETWORK_PAGE_SIZE
+
+        for (pageNum in 1..numberOfPages) {
+            val response = service.getIssues(IssueState.ALL.state, pageNum, NETWORK_PAGE_SIZE)
+            if (response.isNotEmpty()) {
+                database.issuesDao().insertAll(response)
+                val remoteKeys = mutableListOf<RemoteKeys>()
+                for (issue in response) {
+                    remoteKeys.add(0, RemoteKeys(
+                        issue.id,
+                        getPreviousKeyForWorker(pageNum),
+                        getNextPageKeyForWorker(pageNum),
+                        IssueState.ALL.state)
+                    )
+                }
+                database.remoteKeysDao().insertAll(remoteKeys)
+            }
+        }
     }
 
     companion object {

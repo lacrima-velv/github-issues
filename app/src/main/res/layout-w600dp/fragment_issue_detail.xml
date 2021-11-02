@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_below="@id/appbar"
-    android:paddingBottom="16dp"
-    android:clipToPadding="false">
+    android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/divider"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:src="@drawable/issue_details_divider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <TextView
             android:id="@+id/issue_details_title"
@@ -22,7 +28,7 @@
             android:layout_marginEnd="@dimen/margin_on_sides"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/divider"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Throwing retrofit2.HttpException 500 Internal Server Error" />
 
@@ -36,7 +42,7 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             app:layout_constraintEnd_toStartOf="@+id/issue_details_state"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/divider"
             app:layout_constraintTop_toBottomOf="@+id/issue_details_title"
             tools:text="#1234" />
 
@@ -62,7 +68,7 @@
             android:layout_marginTop="@dimen/margin_between_elements"
             android:layout_marginEnd="@dimen/margin_on_sides"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/divider"
             app:layout_constraintTop_toBottomOf="@+id/issue_details_number"
             tools:text="Exception in thread main kotlin.KotlinNullPointerException:
         Response from com.example.retrofit_okhttp_kotlin.WebInterface.logout was null
@@ -79,7 +85,7 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginStart="@dimen/margin_on_sides"
             app:layout_constraintBottom_toBottomOf="@id/issue_details_author_avatar"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/divider"
             app:layout_constraintTop_toTopOf="@id/issue_details_author_avatar"
             android:text="@string/posted_by" />
 
@@ -117,7 +123,7 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginStart="@dimen/margin_on_sides"
             app:layout_constraintBottom_toBottomOf="@id/issue_details_assignee_avatar"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/divider"
             app:layout_constraintTop_toTopOf="@id/issue_details_assignee_avatar"
             android:text="@string/assigned_to" />
 
@@ -155,7 +161,7 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginStart="@dimen/margin_on_sides"
             android:layout_marginTop="@dimen/margin_between_elements"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/divider"
             app:layout_constraintTop_toBottomOf="@id/issue_details_assignee_avatar"
             android:text="@string/updated" />
 
@@ -179,7 +185,8 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginStart="@dimen/margin_on_sides"
             android:layout_marginTop="@dimen/margin_between_elements"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="@dimen/margin_on_sides"
+            app:layout_constraintStart_toStartOf="@id/divider"
             app:layout_constraintTop_toBottomOf="@id/issue_details_updated"
             android:text="@string/created" />
 
@@ -191,6 +198,7 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginTop="@dimen/margin_between_elements"
             android:layout_marginStart="@dimen/margin_between_elements"
+            android:layout_marginBottom="@dimen/margin_on_sides"
             app:layout_constraintStart_toStartOf="@+id/guideline"
             app:layout_constraintTop_toBottomOf="@id/issue_details_updated_date"
             tools:text="2 days ago" />

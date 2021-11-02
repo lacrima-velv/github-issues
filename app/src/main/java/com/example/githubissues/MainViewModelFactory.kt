@@ -1,5 +1,6 @@
 package com.example.githubissues
 
+import android.app.Application
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -9,9 +10,8 @@ import com.example.githubissues.data.GithubRepository
 import java.lang.IllegalArgumentException
 
 class MainViewModelFactory(
-    owner: SavedStateRegistryOwner,
-    private val repository: GithubRepository,
-    //private val savedStateHandle: SavedStateHandle
+    private val application: Application,
+    owner: SavedStateRegistryOwner
 ): AbstractSavedStateViewModelFactory(owner, null) {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(
@@ -20,7 +20,7 @@ class MainViewModelFactory(
         handle: SavedStateHandle
     ): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            return MainViewModel(repository, handle) as T
+            return MainViewModel(application, handle) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

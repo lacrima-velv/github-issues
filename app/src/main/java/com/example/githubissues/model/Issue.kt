@@ -1,10 +1,8 @@
 package com.example.githubissues.model
 
 import androidx.recyclerview.widget.DiffUtil
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Relation
+import androidx.room.*
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "issues")
@@ -14,15 +12,18 @@ data class Issue(
     @Embedded val user: User?,
     @Embedded val assignee: Assignee?,
     //@SerializedName("html_url")
-    val number: Long,
-    val title: String,
-    val state: String,
+    val number: Long?,
+    val title: String?,
+    val state: String?,
     val body: String?,
     @SerializedName("created_at")
     val createdAt: String?,
     @SerializedName("updated_at")
     val updatedAt: String?,
-    val closedAt: String?
+    val closedAt: String?,
+    @Expose(serialize = false, deserialize = false)
+    // If true, use 1. If false, use 0.
+    val isSelected: Int = 0
 ) {
 
     data class User(
@@ -46,11 +47,15 @@ data class Issue(
     companion object {
         val DiffCallback = object : DiffUtil.ItemCallback<Issue>() {
             override fun areItemsTheSame(oldItem: Issue, newItem: Issue): Boolean {
-                return oldItem == newItem
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItem: Issue, newItem: Issue): Boolean {
-                return oldItem.id == newItem.id
+                return (oldItem.isSelected == newItem.isSelected &&
+                        oldItem.state == newItem.state &&
+                        oldItem.assignee == newItem.assignee &&
+                        oldItem.title == newItem.title &&
+                        oldItem.body == newItem.body)
             }
         }
     }
