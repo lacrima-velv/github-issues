@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class UploadIssuesWorker(
@@ -17,6 +18,7 @@ class UploadIssuesWorker(
     override suspend fun doWork() =
         // Do the work here. In this case - upload the Issues.
         try {
+            Timber.d("doWork() is called")
             //repo.getIssues(IssueState.ALL.state)
                 repo.getIssuesByWorkManager()
             Result.success()
@@ -26,6 +28,7 @@ class UploadIssuesWorker(
 
     companion object {
         fun enqueueWork(context: Context) {
+            Timber.d("enqueueWork() is called")
             WorkManager
                 .getInstance(context)
                 .enqueueUniquePeriodicWork(

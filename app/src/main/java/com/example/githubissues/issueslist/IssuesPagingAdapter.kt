@@ -22,7 +22,7 @@ in the form of new PagingData objects
  */
 class IssuesPagingAdapter(
     private val onClick: (Long) -> Boolean,
-   // private val onFirstDetailsOpened: (Issue, View) -> Unit,
+    private val onFirstDetailsOpened: (Issue, View) -> Unit,
 ) :
     PagingDataAdapter<Issue, IssuesPagingAdapter.IssueItemViewHolder>(Issue.DiffCallback) {
 
@@ -61,10 +61,17 @@ class IssuesPagingAdapter(
 //                binding.root.isActivated = true
 //                onClick(issueId)
 //            }
+//            if (issue.isSelected == 1) {
+//                binding.root.isActivated
+//                Timber.d("binding.root.measuredWidth is ${binding.root.}")
+//                if (binding.root.measuredWidth >= 600) {
+//                    onClick(issueId)
+//                }
+//            }
 
 
-            //onFirstDetailsOpened(issue, binding.root)
-            binding.root.isActivated = issue.isSelected == 1
+            onFirstDetailsOpened(issue, binding.root)
+            //binding.root.isActivated = issue.isSelected == 1
 
 
             //binding.root.isActivated = issue.isSelected == 1

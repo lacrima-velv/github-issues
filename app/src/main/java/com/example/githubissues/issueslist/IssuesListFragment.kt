@@ -1,6 +1,7 @@
 package com.example.githubissues.issueslist
 
 import android.app.Application
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -17,15 +18,19 @@ import androidx.paging.LoadState
 import androidx.recyclerview.selection.*
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.example.githubissues.*
 import com.example.githubissues.R
+import com.example.githubissues.Utils.toDp
 import com.example.githubissues.databinding.ErrorRetryViewBinding
 import com.example.githubissues.databinding.FragmentIssuesListBinding
 import com.example.githubissues.databinding.ProgressViewBinding
+import com.example.githubissues.model.Issue
 import com.example.githubissues.model.IssueState
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class IssuesListFragment : Fragment() {
 
@@ -41,25 +46,50 @@ class IssuesListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
+        // TODO: Try to fix bug: if app was closed with selected issue it remains selected in a list,
+        // but there's nothing opened in panel
+        // Maybe you should check if anything is selected - then call onClick? but what to do in portrait?
+
         viewModelFactory =  MainViewModelFactory(Application(), this)
 
-        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+//        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(MainViewModel::class.java)
 
         viewModel.isAnyIssueSelected.observe(viewLifecycleOwner) { }
+        viewModel.isLayoutVertical.observe(viewLifecycleOwner) { }
+
 
         binding = FragmentIssuesListBinding.inflate(inflater, container, false)
 
-        val issuesListToolbarTitle = { (activity as MainActivity).changeToolbarTitle("Issues list") }
-        val issueDetailsToolbarTitle = { (activity as MainActivity).changeToolbarTitle("Issue Details") }
+        if (savedInstanceState != null) {
+            val selectedTab = savedInstanceState.getInt("tabState")
+            binding.tabBar.selectTab(binding.tabBar.getTabAt(selectedTab))
+        }
 
+        val issuesListToolbarTitle = {
+            (activity as MainActivity).changeToolbarTitle("Issues List")
+            //viewModel.setLayoutVertical(false)
+        }
+        val issueDetailsToolbarTitle = {
+            (activity as MainActivity).changeToolbarTitle("Issue Details")
+            //viewModel.setLayoutVertical(true)
+        }
 
+        Timber.d("slidingPaneLayout: width is ${resources.displayMetrics.widthPixels.toDp} height is ${resources.displayMetrics.heightPixels.toDp}}")
 
+        Timber.d("slidingPaneLayout: title is ${(activity as MainActivity).getToolbarTitle()}")
+        if ((activity as MainActivity).getToolbarTitle() == "Issue Details") {
+            viewModel.setLayoutVertical(true)
+        } else if ((activity as MainActivity).getToolbarTitle() == "Issues List") {
+            viewModel.setLayoutVertical(false)
+        }
         // Connect the SlidingPaneLayout to the system back button
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             TwoPaneOnBackPressedCallback(
                 binding.slidingPaneLayout,
                 issuesListToolbarTitle,
-                issueDetailsToolbarTitle
+                issueDetailsToolbarTitle,
+                viewModel.isLayoutVertical.value
         )
         )
 
@@ -96,21 +126,35 @@ class IssuesListFragment : Fragment() {
             binding.slidingPaneLayout.openPane()
 
         }
-
-//        val onFirstDetailsOpened = { issue: Issue, view: View ->
+//                val onFirstDetailsOpened = { issue: Issue, view: View ->
 //            val width = resources.displayMetrics.widthPixels.toDp
 //            view.isActivated = issue.isSelected == 1
 //            Timber.d("onFirstDetailsOpened is called. width is $width and viewModel.isAnyIssueSelected.value is ${viewModel.isAnyIssueSelected.value}")
 //        }
 
+        val onFirstDetailsOpened = { issue: Issue, view: View ->
+            val width = resources.displayMetrics.widthPixels.toDp
+            //view.isActivated = issue.isSelected == 1
+
+            if (issue.isSelected == 1) {
+                Timber.d("issue.isSelected == 1 returns ${issue.isSelected}")
+                view.isActivated = true
+            } else {
+                view.isActivated = false
+            }
+
+
+            Timber.d("onFirstDetailsOpened is called. width is $width and viewModel.isAnyIssueSelected.value is ${viewModel.isAnyIssueSelected.value}")
+        }
+
         issuesPagingAdapter = IssuesPagingAdapter(
             onIssueClick,
-            //onFirstDetailsOpened
+            onFirstDetailsOpened
         )
 
-        // Save scrolling position when fragment is recreated
-        issuesPagingAdapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+//        // Save scrolling position when fragment is recreated
+//        issuesPagingAdapter.stateRestorationPolicy =
+//            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         // Listen to Swipe to refresh gesture
         binding.addRefreshListener(issuesPagingAdapter)
@@ -126,6 +170,15 @@ class IssuesListFragment : Fragment() {
         )
 
         return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val configuration = (activity as MainActivity).resources.configuration.orientation
+        if (configuration == Configuration.ORIENTATION_PORTRAIT) {
+            binding.slidingPaneLayout.closePane()
+        }
     }
 
     /**
@@ -195,6 +248,11 @@ class IssuesListFragment : Fragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("tabState", binding.tabBar.selectedTabPosition)
+    }
+
     private fun FragmentIssuesListBinding.updateIssuesListByChoosingState(
         chosenState: String,
         onIssueStateChosen: (UiAction.ChooseIssueState) -> Unit
@@ -211,6 +269,8 @@ class IssuesListFragment : Fragment() {
         //onIssueStateChosen: (UiAction.ChooseIssueState) -> Unit
     ) {
         errorRetryViewBinding.retryButton.setOnClickListener { issuesPagingAdapter.retry() }
+
+        // TODO: Try to fix: when screen rotated with selected issue, which
 
         issuesList.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -302,6 +362,16 @@ class IssuesListFragment : Fragment() {
 
     }
 
+//    override fun onConfigurationChanged(newConfig: Configuration) {
+//        Timber.d("onConfigurationChanged is called")
+//        super.onConfigurationChanged(newConfig)
+//
+//        val configuration = (activity as MainActivity).resources.configuration.orientation
+//        if (configuration == Configuration.ORIENTATION_PORTRAIT) {
+//            binding.slidingPaneLayout.closePane()
+//        }
+//    }
+
 
 
 
@@ -312,10 +382,6 @@ class IssuesListFragment : Fragment() {
             issuesPagingAdapter.refresh()
         }
     }
-
-
-
-
 
 
 }

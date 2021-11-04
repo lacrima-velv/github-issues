@@ -97,7 +97,8 @@ class GithubRepository(
                         issue.id,
                         getPreviousKeyForWorker(pageNum),
                         getNextPageKeyForWorker(pageNum),
-                        IssueState.ALL.state)
+                       // IssueState.ALL.state
+                    )
                     )
                 }
                 database.remoteKeysDao().insertAll(remoteKeys)

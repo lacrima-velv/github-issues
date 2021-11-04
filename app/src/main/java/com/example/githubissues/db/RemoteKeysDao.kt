@@ -18,11 +18,18 @@ interface RemoteKeysDao {
     suspend fun getRemoteKeysByIssueId(issueId: Long): RemoteKeys?
 
     // @Query("DELETE FROM remote_keys WHERE issueState = :state")
-    @Query("DELETE FROM remote_keys WHERE issueState = :state AND NOT issueId = (SELECT id FROM issues WHERE isSelected = 1)")
+//    @Query("DELETE FROM remote_keys WHERE issueState = :state AND NOT issueId = (SELECT id FROM issues WHERE isSelected = 1)")
+//    suspend fun clearRemoteKeysWithIssueState(state: String)
+
+    @Query("DELETE FROM remote_keys WHERE issueId = (" +
+            "SELECT id FROM issues INNER JOIN remote_keys ON id = issueId " +
+            "WHERE isSelected = 0 AND state = :state)")
     suspend fun clearRemoteKeysWithIssueState(state: String)
 
-    //@Query("DELETE FROM remote_keys")
-    @Query("DELETE FROM remote_keys WHERE NOT issueId = (SELECT id FROM issues WHERE isSelected = 1)")
+//    @Query("DELETE FROM remote_keys WHERE NOT issueId = (SELECT id FROM issues WHERE isSelected = 1)")
+//    suspend fun clearRemoteKeys()
+    @Query("DELETE FROM remote_keys WHERE issueId = (" +
+            "SELECT id FROM issues INNER JOIN remote_keys ON id = issueId WHERE isSelected = 0)")
     suspend fun clearRemoteKeys()
 
 //    @Query("DELETE FROM remote_keys WHERE (SELECT isSelected FROM issues INNER JOIN remote_keys ON id = issueId WHERE isSelected = 0)")

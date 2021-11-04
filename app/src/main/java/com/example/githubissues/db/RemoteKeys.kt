@@ -9,5 +9,5 @@ data class RemoteKeys(
     val prevKey: Int?,
     val nextKey: Int?,
     // TODO: Try to delete this field and use it from IssuesDao
-    val issueState: String
+    //val issueState: String
 )

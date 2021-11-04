@@ -40,6 +40,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
+    fun getToolbarTitle(): String {
+        return binding.toolbar?.title.toString()
+    }
+
     fun changeToolbarTitle(title: String) {
         binding.toolbar?.title = title
     }

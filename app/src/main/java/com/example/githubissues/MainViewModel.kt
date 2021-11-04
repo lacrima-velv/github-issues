@@ -43,8 +43,18 @@ class MainViewModel(
     val isAnyIssueSelected: LiveData<Boolean>
         get() = _isAnyIssueSelected
 
+    private val _isLayoutVertical = MutableLiveData<Boolean>()
+    val isLayoutVertical: LiveData<Boolean>
+        get() = _isLayoutVertical
+    fun setLayoutVertical(isVertical: Boolean) {
+        Timber.d("slidingPaneLayout: Set layout verticality. isVertical = $isVertical")
+        _isLayoutVertical.value = isVertical
+    }
+
 
         init {
+            Timber.d("ViewModel init")
+            deselectLastSelectedIssue()
 
             UploadIssuesWorker.enqueueWork(getApplication())
 

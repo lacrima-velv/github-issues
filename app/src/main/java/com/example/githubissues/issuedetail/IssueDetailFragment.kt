@@ -1,6 +1,7 @@
 package com.example.githubissues.issuedetail
 
 import android.app.Application
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.size.Precision
@@ -17,6 +19,7 @@ import coil.size.ViewSizeResolver
 import coil.transform.CircleCropTransformation
 import com.example.githubissues.*
 import com.example.githubissues.Utils.getRelativeTime
+import com.example.githubissues.Utils.toDp
 import com.example.githubissues.api.GithubApiService
 import com.example.githubissues.data.GithubRepository
 import com.example.githubissues.databinding.FragmentIssueDetailBinding
@@ -37,10 +40,6 @@ class IssueDetailFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val service = GithubApiService.create()
-        val issuesDatabase = IssuesDatabase.getInstance(requireContext())
-
-        val repository = GithubRepository(service, issuesDatabase)
 
         binding = FragmentIssueDetailBinding.inflate(layoutInflater)
         //val issueId = if (IssueDetailFragmentArgs.fromBundle(requireArguments()))
@@ -50,18 +49,10 @@ class IssueDetailFragment : Fragment() {
         val id = arguments?.getLong("issueId")
         Timber.d("issue id is $id")
 
-        //val args = IssueDetailFragmentArgs.fromBundle(requireArguments())
-        //Timber.d("Got an issue id ${args.issueId}")
-
-//        val navHostFragment = parentFragmentManager.findFragmentById(R.id.nav_host_fragment)
-//                as NavHostFragment
-//        val navController = navHostFragment.navController
-
-       // appContainer = (Application() as MyApplication).appContainer
-
         viewModelFactory =  MainViewModelFactory(Application(), this)
 
-        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+//        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(MainViewModel::class.java)
 
 //        viewModel = ViewModelProvider(
 //            this, Injection.provideViewModelFactory(
@@ -78,10 +69,6 @@ class IssueDetailFragment : Fragment() {
         id?.let {
             viewModel.getIssueDetails(it)
             binding.showIssueDetails(viewModel.currentIssueDetails.value)
-
-//            if (viewModel.currentIssueDetails.value?.title == null) {
-//                binding.showPlaceholder()
-//            }
         } ?: binding.showPlaceholder()
 
         viewModel.currentIssueDetails.observe(viewLifecycleOwner) {
@@ -89,6 +76,8 @@ class IssueDetailFragment : Fragment() {
             binding.showIssueDetails(viewModel.currentIssueDetails.value)
         }
 
+
+        Timber.d("On create view details")
         return binding.root
     }
 
@@ -192,6 +181,7 @@ class IssueDetailFragment : Fragment() {
             imageView.setImageResource(R.drawable.ic_user_placeholder)
         }
     }
+
 
     fun getIssueId() {
         val args : IssueDetailFragmentArgs? = arguments?.let { IssueDetailFragmentArgs.fromBundle(it) }

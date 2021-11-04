@@ -86,7 +86,7 @@ class GithubRemoteMediator(
                         issueId = it.id,
                         prevKey = prevKey,
                         nextKey = nextKey,
-                        issueState = issueState
+                        //issueState = issueState
                     )
                 }
                 issuesDatabase.remoteKeysDao().insertAll(keys)
