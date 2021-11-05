@@ -27,7 +27,7 @@
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/action_bar_size_w600dp"
-                app:title="Issues List"/>
+                app:title="@string/issues_list_toolbar"/>
 
         </com.google.android.material.appbar.AppBarLayout>
 

@@ -34,23 +34,10 @@ class MainViewModel(
      */
     //All requests to the ViewModel go through a single entry point - the accept field
     val accept: (UiAction) -> Unit
-   // val accept: (UiAction) -> Issue
+
     private val _currentIssueDetails = MutableLiveData<Issue>()
     val currentIssueDetails: LiveData<Issue>
         get() = _currentIssueDetails
-
-    private val _isAnyIssueSelected = MutableLiveData<Boolean>()
-    val isAnyIssueSelected: LiveData<Boolean>
-        get() = _isAnyIssueSelected
-
-    private val _isLayoutVertical = MutableLiveData<Boolean>()
-    val isLayoutVertical: LiveData<Boolean>
-        get() = _isLayoutVertical
-    fun setLayoutVertical(isVertical: Boolean) {
-        Timber.d("slidingPaneLayout: Set layout verticality. isVertical = $isVertical")
-        _isLayoutVertical.value = isVertical
-    }
-
 
         init {
             Timber.d("ViewModel init")
@@ -58,7 +45,7 @@ class MainViewModel(
 
             UploadIssuesWorker.enqueueWork(getApplication())
 
-            _isAnyIssueSelected.value = false
+            //_isAnyIssueSelected.value = false
             //_isInitiallyNavigatedToDetails.value = false
 
         // Default value
@@ -125,6 +112,7 @@ class MainViewModel(
                  */
                     .distinctUntilChangedBy { it.second }
                     .map { (scroll, pagingData) ->
+                        Timber.d("issueStateChange.issueState is ${issueStateChange.issueState} scroll.currentIssueState is ${scroll.currentIssueState}")
                         UiState(
                             issueState = issueStateChange.issueState,
                             pagingData = pagingData,
@@ -133,7 +121,7 @@ class MainViewModel(
                             If the issueStateChange issue state matches the scroll issue state,
                             the user has scrolled
                              */
-                        hasNotScrolledForCurrentState = issueStateChange.issueState != scroll.currentIssueState
+                             hasNotScrolledForCurrentState = issueStateChange.issueState != scroll.currentIssueState
                         )
                     }
             }
@@ -150,9 +138,11 @@ class MainViewModel(
 
     }
 
-    private fun changeIssueState(issueState: String): Flow<PagingData<Issue>> =
-        repo.getIssues(issueState)
+    private fun changeIssueState(issueState: String): Flow<PagingData<Issue>> {
+       return repo.getIssues(issueState)
             .cachedIn(viewModelScope)
+    }
+
 
 
 
@@ -208,4 +198,4 @@ data class UiState(
 
 private val DEFAULT_ISSUE_STATE = IssueState.ALL.state
 private val LAST_CHOSEN_ISSUE_STATE = IssueState.ALL.state
-private val LAST_ISSUE_STATE_SCROLLED: String = IssueState.ALL.state
+private val LAST_ISSUE_STATE_SCROLLED = IssueState.ALL.state

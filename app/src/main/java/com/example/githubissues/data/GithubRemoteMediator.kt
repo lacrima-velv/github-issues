@@ -43,7 +43,6 @@ class GithubRemoteMediator(
                 val prevKey = remoteKeys?.prevKey
                     ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
                 prevKey
-
             }
             // When we need to load data at the end of the currently loaded data set,
             // the load parameter is LoadType.APPEND
@@ -65,14 +64,14 @@ class GithubRemoteMediator(
 
             val endOfPaginationReached = apiResponse.isEmpty()
             issuesDatabase.withTransaction {
-                // Clear just keys for issues which are currently displayed
+                // Clear keys only for issues which are currently displayed
                 if (loadType == LoadType.REFRESH) {
                     if (issueState == IssueState.ALL.state) {
                         issuesDatabase.remoteKeysDao().clearRemoteKeys()
                     } else {
                         issuesDatabase.remoteKeysDao().clearRemoteKeysWithIssueState(issueState)
                     }
-                    // Clear just issues which are currently displayed
+                    // Clear only issues which are currently displayed
                     if (issueState == IssueState.ALL.state) {
                         issuesDatabase.issuesDao().clearIssues()
                     } else {
@@ -85,8 +84,7 @@ class GithubRemoteMediator(
                     RemoteKeys(
                         issueId = it.id,
                         prevKey = prevKey,
-                        nextKey = nextKey,
-                        //issueState = issueState
+                        nextKey = nextKey
                     )
                 }
                 issuesDatabase.remoteKeysDao().insertAll(keys)

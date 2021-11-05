@@ -55,7 +55,8 @@ data class Issue(
                         oldItem.state == newItem.state &&
                         oldItem.assignee == newItem.assignee &&
                         oldItem.title == newItem.title &&
-                        oldItem.body == newItem.body)
+                        oldItem.body == newItem.body &&
+                        oldItem.updatedAt == newItem.updatedAt)
             }
         }
     }

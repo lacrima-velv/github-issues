@@ -13,25 +13,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-//
-//        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-//            as NavHostFragment
-//        val navController = navHostFragment.navController
-//        val toolbar = binding.toolbar
-
-        //toolbar?.setupWithNavController(navController)
-
-//        /*
-//        The MaterialToolbar can be set as the support action bar and thus
-//        receive various Activity callbacks
-//         */
-//        setSupportActionBar(binding.toolbar)
-        binding.toolbar?.title = "Issues list"
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
@@ -44,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         return binding.toolbar?.title.toString()
     }
 
+    // Used for sliding two panes layout
     fun changeToolbarTitle(title: String) {
         binding.toolbar?.title = title
     }

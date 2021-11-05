@@ -1,17 +1,13 @@
 package com.example.githubissues.issueslist
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.selection.ItemDetailsLookup
-import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.RecyclerView
 import com.example.githubissues.R
 import com.example.githubissues.Utils.getRelativeTime
 import com.example.githubissues.databinding.IssueItemBinding
 import com.example.githubissues.model.Issue
-import kotlinx.coroutines.Job
 import timber.log.Timber
 import java.util.*
 
@@ -21,8 +17,8 @@ DiffUtil on a background thread to compute fine-grained updates as updated conte
 in the form of new PagingData objects
  */
 class IssuesPagingAdapter(
-    private val onClick: (Long) -> Boolean,
-    private val onFirstDetailsOpened: (Issue, View) -> Unit,
+    private val onClick: (Long) -> Boolean
+    //private val onFirstDetailsOpened: (Issue, View) -> Unit,
 ) :
     PagingDataAdapter<Issue, IssuesPagingAdapter.IssueItemViewHolder>(Issue.DiffCallback) {
 
@@ -39,12 +35,8 @@ class IssuesPagingAdapter(
             Timber.d("bind() is called")
             issueTitle.text = issue.title
             issueNumber.text = context.getString(R.string.issue_number,issue.number)
-            // TODO use Unknown in strings. Add by to strings
-            issueAuthor.text = issue.user?.userLogin ?: "Unknown"
-            // TODO convert date to "N days ago"
-            //issueUpdatedDate.text = issue.updatedAt
+            issueAuthor.text = issue.user?.userLogin ?: context.getString(R.string.unknown)
             issueUpdatedDate.text = issue.updatedAt?.let { getRelativeTime(it) }
-            // TODO add to strings "State: ..."
             issueState.text = context.getString(R.string.issue_state, issue.state?.replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase(
                     Locale.getDefault()
@@ -53,46 +45,19 @@ class IssuesPagingAdapter(
 
             val issueId = issue.id
 
-//            Timber.d("before isAnyIssueSelected is $isAnyIssueSelected")
-//            if (isAnyIssueSelected != true) {
-//                setIsAnyIssueSelectedToTrue()
-//                Timber.d("after isAnyIssueSelected is $isAnyIssueSelected")
-//                setSelectedIssue(issueId)
-//                binding.root.isActivated = true
-//                onClick(issueId)
-//            }
-//            if (issue.isSelected == 1) {
-//                binding.root.isActivated
-//                Timber.d("binding.root.measuredWidth is ${binding.root.}")
-//                if (binding.root.measuredWidth >= 600) {
-//                    onClick(issueId)
-//                }
-//            }
-
-
-            onFirstDetailsOpened(issue, binding.root)
-            //binding.root.isActivated = issue.isSelected == 1
-
-
-            //binding.root.isActivated = issue.isSelected == 1
+            // If issue is selected in DB, then highlight it. Else - clean highlighting.
+            binding.root.isActivated = issue.isSelected == 1
             Timber.d("issue.isSelected returned ${issue.isSelected}")
-            //binding.root.isActivated = false
 
             binding.root.setOnClickListener {
-
-//                deselectLastSelectedIssue()
-//
-//                setSelectedIssue(issueId)
-
+                // Highlight issue
                 binding.root.isActivated = true
-
+                // Then open its details, deselect last selected issue and add this issue
+                // as selected in DB
                 onClick(issueId)
             }
         }
     }
-
-
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IssueItemViewHolder {
         return IssueItemViewHolder(
@@ -105,13 +70,10 @@ class IssuesPagingAdapter(
     }
 
     override fun onBindViewHolder(holder: IssueItemViewHolder, position: Int) {
-        Timber.d("OnBindViewHolder is called")
         val issueInList = getItem(position)
         if (issueInList != null) {
                 holder.bind(issueInList)
         }
     }
-
-
 
 }

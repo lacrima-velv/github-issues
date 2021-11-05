@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Github Issues</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="issue_state">State: %s</string>
     <string name="assigned_to">Assigned to:</string>
@@ -18,5 +17,6 @@
     <string name="placeholder_no_issue_details">Tap an issue in the list, if there are any.\nIssue details will be displayed here</string>
     <string name="something_went_wrong">Something went wrong.\nWe are already working on this issue.</string>
     <string name="retry">Retry</string>
-    <string name="issue_details_action_bar">Issue Details</string>
+    <string name="issue_details_toolbar">Issue Details</string>
+    <string name="issues_list_toolbar">Issues</string>
 </resources>

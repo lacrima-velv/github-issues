@@ -43,7 +43,6 @@ class GithubRepository(
                 issueState
             ),
             pagingSourceFactory = {
-                Timber.d("Create pagingSourceFactory. issueState.state is $issueState")
                 if (issueState != IssueState.ALL.state) {
                     database.issuesDao().getAllIssuesNoDetails(issueState)
                 } else {
@@ -54,7 +53,7 @@ class GithubRepository(
     }
 
     suspend fun getIssueDetails(issueId: Long): Issue {
-       return database.issuesDao().getIssueDetailsById(issueId)
+        return database.issuesDao().getIssueDetailsById(issueId)
     }
 
     suspend fun deselectLastSelectedIssue() {
@@ -66,10 +65,10 @@ class GithubRepository(
         return database.issuesDao().setIssueSelected(id)
     }
 
-    suspend fun checkIsIssueSelected(id: Long): Int {
-        Timber.d("database.issuesDao().checkIsIssueSelected(id) returned ${database.issuesDao().checkIsIssueSelected(id)}")
-        return database.issuesDao().checkIsIssueSelected(id)
-    }
+//    suspend fun checkIsIssueSelected(id: Long): Int {
+//        Timber.d("database.issuesDao().checkIsIssueSelected(id) returned ${database.issuesDao().checkIsIssueSelected(id)}")
+//        return database.issuesDao().checkIsIssueSelected(id)
+//    }
 
     private fun getNextPageKeyForWorker(pageNum: Int) =
         when (pageNum) {
@@ -83,9 +82,8 @@ class GithubRepository(
             else -> pageNum - 1
         }
 
-
     suspend fun getIssuesByWorkManager() {
-        val numberOfPages = (NETWORK_PAGE_SIZE + PREFETCH_DISTANCE) / NETWORK_PAGE_SIZE
+        val numberOfPages = (INITIAL_LOAD_SIZE + PREFETCH_DISTANCE) / NETWORK_PAGE_SIZE
 
         for (pageNum in 1..numberOfPages) {
             val response = service.getIssues(IssueState.ALL.state, pageNum, NETWORK_PAGE_SIZE)
@@ -96,9 +94,8 @@ class GithubRepository(
                     remoteKeys.add(0, RemoteKeys(
                         issue.id,
                         getPreviousKeyForWorker(pageNum),
-                        getNextPageKeyForWorker(pageNum),
-                       // IssueState.ALL.state
-                    )
+                        getNextPageKeyForWorker(pageNum)
+                        )
                     )
                 }
                 database.remoteKeysDao().insertAll(remoteKeys)

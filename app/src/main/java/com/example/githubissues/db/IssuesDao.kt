@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.githubissues.model.Issue
-import com.example.githubissues.model.IssueState
 
 @Dao
 interface IssuesDao {
@@ -24,9 +23,13 @@ interface IssuesDao {
             "FROM issues ORDER BY updatedAt DESC")
     fun getAllIssuesNoDetailsAllStates(): PagingSource<Int, Issue>
 
+//    @Query("SELECT id, userLogin, number, title, state, updatedAt, closedAt, isSelected " +
+//            "FROM issues WHERE state = 'open' OR state = 'closed' ORDER BY updatedAt DESC")
+//    fun getAllIssuesNoDetailsAllStates(): PagingSource<Int, Issue>
+
     @Query("SELECT * FROM issues WHERE id = :id")
     suspend fun getIssueDetailsById(id: Long): Issue
-
+    // Don't remove selected issues until they became deselected
     @Query("DELETE FROM issues WHERE state = :state AND isSelected = 0")
     suspend fun clearIssuesWithState(state: String)
 
@@ -39,6 +42,6 @@ interface IssuesDao {
     @Query("UPDATE issues SET isSelected = 0 WHERE isSelected = 1")
     suspend fun deselectLastSelectedIssue()
 
-    @Query("SELECT isSelected FROM issues WHERE id = :id")
-    suspend fun checkIsIssueSelected(id: Long): Int
+//    @Query("SELECT isSelected FROM issues WHERE id = :id")
+//    suspend fun checkIsIssueSelected(id: Long): Int
 }

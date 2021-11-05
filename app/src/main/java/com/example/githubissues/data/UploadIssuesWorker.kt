@@ -16,11 +16,10 @@ class UploadIssuesWorker(
     private val repo: GithubRepository by inject()
 
     override suspend fun doWork() =
-        // Do the work here. In this case - upload the Issues.
+        // Do the work here: upload the Issues.
         try {
             Timber.d("doWork() is called")
-            //repo.getIssues(IssueState.ALL.state)
-                repo.getIssuesByWorkManager()
+            repo.getIssuesByWorkManager()
             Result.success()
         } catch (throwable: Throwable) {
             Result.retry()
@@ -35,12 +34,11 @@ class UploadIssuesWorker(
                     "uploadIssuesWorkRequest",
                     ExistingPeriodicWorkPolicy.KEEP,
                     PeriodicWorkRequestBuilder<UploadIssuesWorker>(PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
-                        //.setInitialDelay(5, TimeUnit.MINUTES)
+                        .setInitialDelay(5, TimeUnit.MINUTES)
                         .setConstraints(
                             Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            //.setRequiresStorageNotLow(true)
-                            .build()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build()
                         )
                         .setBackoffCriteria(
                             BackoffPolicy.EXPONENTIAL,

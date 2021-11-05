@@ -7,7 +7,5 @@ import androidx.room.PrimaryKey
 data class RemoteKeys(
     @PrimaryKey val issueId: Long,
     val prevKey: Int?,
-    val nextKey: Int?,
-    // TODO: Try to delete this field and use it from IssuesDao
-    //val issueState: String
+    val nextKey: Int?
 )
