@@ -18,14 +18,12 @@ import androidx.paging.LoadState
 import androidx.recyclerview.selection.*
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import androidx.slidingpanelayout.widget.SlidingPaneLayout
+import androidx.viewpager2.widget.ViewPager2
 import com.example.githubissues.*
 import com.example.githubissues.R
-import com.example.githubissues.Utils.toDp
 import com.example.githubissues.databinding.ErrorRetryViewBinding
 import com.example.githubissues.databinding.FragmentIssuesListBinding
 import com.example.githubissues.databinding.ProgressViewBinding
-import com.example.githubissues.model.Issue
 import com.example.githubissues.model.IssueState
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.*
@@ -48,6 +46,24 @@ class IssuesListFragment : Fragment() {
         viewModelFactory =  MainViewModelFactory(Application(), this)
 
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(MainViewModel::class.java)
+
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.isScrolled.collect {
+                Timber.d("Collect is called")
+                when (it) {
+                    is MainViewModel.ScrollUiState.FScrolled -> {
+
+                    }
+                    is MainViewModel.ScrollUiState.FNotScrolled -> {
+
+                    }
+                }
+            }
+        }
+
+
+        viewModel.scrolled.observe(viewLifecycleOwner) { }
 
         //viewModel.isAnyIssueSelected.observe(viewLifecycleOwner) { }
         //viewModel.isLayoutVertical.observe(viewLifecycleOwner) { }
@@ -88,6 +104,8 @@ class IssuesListFragment : Fragment() {
         )
 
 
+
+
         // We need to bind the root layout with our binder for external layout
         errorRetryViewBinding = ErrorRetryViewBinding.bind(binding.root)
         progressViewBinding = ProgressViewBinding.bind(binding.root)
@@ -120,30 +138,13 @@ class IssuesListFragment : Fragment() {
             binding.slidingPaneLayout.openPane()
 
         }
-//                val onFirstDetailsOpened = { issue: Issue, view: View ->
-//            val width = resources.displayMetrics.widthPixels.toDp
-//            view.isActivated = issue.isSelected == 1
-//            Timber.d("onFirstDetailsOpened is called. width is $width and viewModel.isAnyIssueSelected.value is ${viewModel.isAnyIssueSelected.value}")
-//        }
-
-//        val onFirstDetailsOpened = { issue: Issue, view: View ->
-//            val width = resources.displayMetrics.widthPixels.toDp
-//            //view.isActivated = issue.isSelected == 1
-//
-//            if (issue.isSelected == 1) {
-//                Timber.d("issue.isSelected == 1 returns ${issue.isSelected}")
-//                view.isActivated = true
-//            } else {
-//                view.isActivated = false
-//            }
-//
-//
-//            Timber.d("onFirstDetailsOpened is called. width is $width and viewModel.isAnyIssueSelected.value is ${viewModel.isAnyIssueSelected.value}")
-//        }
 
         issuesPagingAdapter = IssuesPagingAdapter(
             onIssueClick
             //onFirstDetailsOpened
+        )
+        issuesPagingAdapter.registerAdapterDataObserver(
+            observeIssuesList()
         )
 
 //        // Save scrolling position when fragment is recreated
@@ -202,7 +203,7 @@ class IssuesListFragment : Fragment() {
         bindList(
             issuesPagingAdapter = issuesPagingAdapter,
             uiState = uiState,
-            onScrollChanged = uiActions
+          //  onScrollChanged = uiActions
         )
     }
 
@@ -230,6 +231,8 @@ class IssuesListFragment : Fragment() {
                 }
 
                 updateIssuesListByChoosingState(chosenState, onIssueStateChosen)
+                viewModel.resetScroll()
+                viewModel.fresetScroll()
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -260,9 +263,9 @@ class IssuesListFragment : Fragment() {
         onIssueStateChosen: (UiAction.ChooseIssueState) -> Unit
     ) {
         onIssueStateChosen(UiAction.ChooseIssueState(chosenState))
-        issuesList.scrollToPosition(0)
+        //issuesList.scrollToPosition(0)
         Timber.d("position: ${issuesList.verticalScrollbarPosition}")
-        //issuesList.scrollTo(0, 0)
+        issuesList.layoutManager?.scrollToPosition(0)
     }
 
     // Save selected tab position to restore it when configuration changes
@@ -274,15 +277,25 @@ class IssuesListFragment : Fragment() {
     private fun FragmentIssuesListBinding.bindList(
         issuesPagingAdapter: IssuesPagingAdapter,
         uiState: StateFlow<UiState>,
-        onScrollChanged: (UiAction.Scroll) -> Unit
-    ) {
+        //onScrollChanged: (UiAction.Scroll) -> Unit
+    ) { Timber.d("BindList is called")
+
+
+
         errorRetryViewBinding.retryButton.setOnClickListener { issuesPagingAdapter.retry() }
 
         issuesList.addOnScrollListener(object: RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy != 0)
-                    onScrollChanged(UiAction.Scroll(currentIssueState = uiState.value.issueState))
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (!swiperefresh.isRefreshing && recyclerView.scrollState == 1) viewModel.doneScroll()
+                if (!swiperefresh.isRefreshing && recyclerView.scrollState == 1) viewModel.fdoneScroll()
+                Timber.d("onScrolled: viewModel.scrolled.value is ${viewModel.scrolled.value}")
             }
+
+//            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+//                if (!swiperefresh.isRefreshing) viewModel.doneScroll()
+//                Timber.d("onScrolled: viewModel.scrolled.value is ${viewModel.scrolled.value}")
+//            }
         })
 
         val notLoading = issuesPagingAdapter.loadStateFlow
@@ -291,16 +304,16 @@ class IssuesListFragment : Fragment() {
             // Only react to cases where Remote REFRESH completes i.e., NotLoading.
             .map { it.refresh is LoadState.NotLoading }
 
-        val hasNotScrolledForCurrentState = uiState
-            .map { it.hasNotScrolledForCurrentState }
-            .distinctUntilChanged()
+//        val hasNotScrolledForCurrentState = uiState
+//            .map { it.hasNotScrolledForCurrentState }
+//            .distinctUntilChanged()
 
-        val shouldScrollToTop = combine(
-            notLoading,
-            hasNotScrolledForCurrentState,
-            Boolean::and
-        )
-            .distinctUntilChanged()
+//        val shouldScrollToTop = combine(
+//            notLoading,
+//            hasNotScrolledForCurrentState,
+//            Boolean::and
+//        )
+//            .distinctUntilChanged()
 
         val pagingData = uiState
             .map { it.pagingData }
@@ -309,6 +322,10 @@ class IssuesListFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             issuesPagingAdapter.loadStateFlow.collect { loadState ->
+                // Reset scroll to autoscroll to Top if the app is refreshing
+//                if (swiperefresh.isRefreshing) {
+//                    viewModel.resetScroll()
+//                }
                 val isListEmpty = loadState.refresh is LoadState.NotLoading
                         && issuesPagingAdapter.itemCount == 0
                 // Show empty list
@@ -350,19 +367,19 @@ class IssuesListFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            combine(shouldScrollToTop, pagingData,::Pair)
+            pagingData
                 /*
                 Each unique PagingData should be submitted once, take the latest from
                 shouldScrollToTop
                 */
                 .distinctUntilChanged()
-                .collectLatest { (shouldScroll, pagingData) ->
+                .collectLatest { pagingData ->
                     issuesPagingAdapter.submitData(pagingData)
                     /*
                     Scroll only after the data has been submitted to the adapter,
                     and is a fresh issue state
                      */
-                    if (shouldScroll) issuesList.scrollToPosition(0)
+                   // if (shouldScroll) issuesList.scrollToPosition(0)
                 }
         }
 
@@ -386,7 +403,28 @@ class IssuesListFragment : Fragment() {
     private fun FragmentIssuesListBinding
             .addRefreshListener(issuesPagingAdapter: IssuesPagingAdapter) {
         swiperefresh.setOnRefreshListener {
+            viewModel.resetScroll()
+            viewModel.fresetScroll()
+            Timber.d("swiperefresh: viewModel.scrolled.value is ${viewModel.scrolled.value}")
             issuesPagingAdapter.refresh()
+        }
+    }
+
+    private fun observeIssuesList() = object : RecyclerView.AdapterDataObserver() {
+        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+            Timber.d("observeIssuesList() is called. viewModel.scrolled.value is ${viewModel.scrolled.value}")
+            //if (viewModel.scrolled.value != true) {
+            if (viewModel.isScrolled.value == MainViewModel.ScrollUiState.FNotScrolled) {
+                binding.issuesList.layoutManager?.scrollToPosition(0)
+            }
+        }
+
+        override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+            super.onItemRangeRemoved(positionStart, itemCount)
+            //if (viewModel.scrolled.value != true) {
+            if (viewModel.isScrolled.value == MainViewModel.ScrollUiState.FNotScrolled) {
+                binding.issuesList.layoutManager?.scrollToPosition(0)
+            }
         }
     }
 

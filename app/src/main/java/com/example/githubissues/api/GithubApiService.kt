@@ -12,6 +12,7 @@ import retrofit2.http.Query
 interface GithubApiService {
     @Headers("Accept: application/vnd.github.v3+json")
     @GET("repos/JetBrains/compose-jb/issues")
+    //@GET("repos/Azure/azure-cli/issues")
     suspend fun getIssues(
         @Query("state") state: String,
         @Query("page") page: Int,

@@ -35,6 +35,29 @@ class MainViewModel(
     //All requests to the ViewModel go through a single entry point - the accept field
     val accept: (UiAction) -> Unit
 
+    private val _isScrolled = MutableStateFlow<ScrollUiState>(ScrollUiState.FNotScrolled)
+    val isScrolled: StateFlow<ScrollUiState>
+        get() = _isScrolled
+
+    fun fdoneScroll() { _isScrolled.value = ScrollUiState.FScrolled }
+
+    fun fresetScroll() { _isScrolled.value = ScrollUiState.FNotScrolled }
+
+    sealed class ScrollUiState {
+        object FScrolled : ScrollUiState()
+        object FNotScrolled: ScrollUiState()
+    }
+
+    private val _scrolled = MutableLiveData<Boolean>()
+    val scrolled: LiveData<Boolean>
+        get() = _scrolled
+    fun doneScroll() {
+        _scrolled.value = true
+    }
+    fun resetScroll() {
+        _scrolled.value = false
+    }
+
     private val _currentIssueDetails = MutableLiveData<Issue>()
     val currentIssueDetails: LiveData<Issue>
         get() = _currentIssueDetails
@@ -68,68 +91,85 @@ class MainViewModel(
             .distinctUntilChanged()
             .onStart { emit(UiAction.ChooseIssueState(initialIssueState)) }
 
-        val issueStatesScrolled = actionStateFlow
-            .filterIsInstance<UiAction.Scroll>()
-            .distinctUntilChanged()
-            /*
-            This is shared to keep the flow "hot" while caching the last state scrolled,
-            otherwise each flatMapLatest invocation (when this flow consumed) would lose
-            the last state scrolled because each time the upstream emits, flatmapLatest will cancel
-            the last Flow it was operating on, and start working based on the new flow it was given.
-            That's why we use operator replay with value 1 to cache the last value
-             */
-            .shareIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-                replay = 1
-            )
-            /*
-            Also used for caching. If the app was killed, but the user had already scrolled with
-            chosen issue state, we don't want to scroll the list to the top causing them
-            to lose their place again
-            */
-            .onStart { emit(UiAction.Scroll(currentIssueState = lastIssueStateScrolled)) }
+//        val issueStatesScrolled = actionStateFlow
+//            .filterIsInstance<UiAction.Scroll>()
+//            .distinctUntilChanged()
+//            /*
+//            This is shared to keep the flow "hot" while caching the last state scrolled,
+//            otherwise each flatMapLatest invocation (when this flow consumed) would lose
+//            the last state scrolled because each time the upstream emits, flatmapLatest will cancel
+//            the last Flow it was operating on, and start working based on the new flow it was given.
+//            That's why we use operator replay with value 1 to cache the last value
+//             */
+//            .shareIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+//                replay = 1
+//            )
+//            /*
+//            Also used for caching. If the app was killed, but the user had already scrolled with
+//            chosen issue state, we don't want to scroll the list to the top causing them
+//            to lose their place again
+//            */
+//            .onStart { emit(UiAction.Scroll(currentIssueState = lastIssueStateScrolled)) }
 
-
-        state = issueStatesChanges
-            /*
-            Use flatmapLatest operator, because each new issue state requires a new Pager to be
-            created and therefore gets a new Flow<PagingData> as well
-            */
-            .flatMapLatest { issueStateChange ->
-                /*
-                Combine it with issueStatesScrolled, but only emitting when we have new emissions of
-                PagingData
-                */
-                combine(
-                    issueStatesScrolled,
-                    changeIssueState(issueState = issueStateChange.issueState),
-                    ::Pair
+            state = issueStatesChanges
+                .flatMapLatest { issueStateChange ->
+                    changeIssueState(issueState = issueStateChange.issueState)
+                        .distinctUntilChangedBy { it }
+                        .map { pagingData ->
+                            UiState(
+                                issueState = issueStateChange.issueState,
+                                pagingData = pagingData
+                            )
+                        }
+                }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+                    initialValue = UiState()
                 )
-                /*
-                Each unique PagingData should be submitted once, take the latest from
-                issueStatesScrolled
-                 */
-                    .distinctUntilChangedBy { it.second }
-                    .map { (scroll, pagingData) ->
-                        Timber.d("issueStateChange.issueState is ${issueStateChange.issueState} scroll.currentIssueState is ${scroll.currentIssueState}")
-                        UiState(
-                            issueState = issueStateChange.issueState,
-                            pagingData = pagingData,
-                            lastStateChosen = scroll.currentIssueState,
-                            /*
-                            If the issueStateChange issue state matches the scroll issue state,
-                            the user has scrolled
-                             */
-                             hasNotScrolledForCurrentState = issueStateChange.issueState != scroll.currentIssueState
-                        )
-                    }
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-                initialValue = UiState()
-            )
+
+
+//        state = issueStatesChanges
+//            /*
+//            Use flatmapLatest operator, because each new issue state requires a new Pager to be
+//            created and therefore gets a new Flow<PagingData> as well
+//            */
+//            .flatMapLatest { issueStateChange ->
+//                /*
+//                Combine it with issueStatesScrolled, but only emitting when we have new emissions of
+//                PagingData
+//                */
+//                combine(
+//                    issueStatesScrolled,
+//                    changeIssueState(issueState = issueStateChange.issueState),
+//                    ::Pair
+//                )
+//                /*
+//                Each unique PagingData should be submitted once, take the latest from
+//                issueStatesScrolled
+//                 */
+//                    .distinctUntilChangedBy { it.second }
+//                    .map { (scroll, pagingData) ->
+//                        Timber.d("issueStateChange.issueState is ${issueStateChange.issueState} scroll.currentIssueState is ${scroll.currentIssueState}")
+//                        UiState(
+//                            issueState = issueStateChange.issueState,
+//                            pagingData = pagingData,
+//                            lastStateChosen = scroll.currentIssueState,
+//                            /*
+//                            If the issueStateChange issue state matches the scroll issue state,
+//                            the user has scrolled
+//                             */
+//                             hasNotScrolledForCurrentState = issueStateChange.issueState != scroll.currentIssueState
+//                        )
+//                    }
+//            }
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+//                initialValue = UiState()
+//            )
 
 
         accept = { action ->
@@ -169,7 +209,7 @@ class MainViewModel(
 
     override fun onCleared() {
         savedStateHandle[DEFAULT_ISSUE_STATE] = state.value.issueState
-        savedStateHandle[LAST_CHOSEN_ISSUE_STATE] = state.value.lastStateChosen
+        //savedStateHandle[LAST_CHOSEN_ISSUE_STATE] = state.value.lastStateChosen
         super.onCleared()
     }
 }
@@ -177,7 +217,7 @@ class MainViewModel(
 // Represents user's actions.
 sealed class UiAction {
     // This let us to associate a scroll action with a particular state
-    data class Scroll(val currentIssueState: String) : UiAction()
+    //data class Scroll(val currentIssueState: String) : UiAction()
     data class ChooseIssueState(val issueState: String) : UiAction()
 }
 /*
@@ -191,8 +231,8 @@ of the list when we shouldn't.
  */
 data class UiState(
     val issueState: String = DEFAULT_ISSUE_STATE,
-    val lastStateChosen: String = LAST_CHOSEN_ISSUE_STATE,
-    val hasNotScrolledForCurrentState: Boolean = false,
+    //val lastStateChosen: String = LAST_CHOSEN_ISSUE_STATE,
+    //val hasNotScrolledForCurrentState: Boolean = false,
     val pagingData: PagingData<Issue> = PagingData.empty()
 )
 
