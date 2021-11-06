@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.size.Precision
@@ -19,6 +20,7 @@ import com.example.githubissues.*
 import com.example.githubissues.Utils.getRelativeTime
 import com.example.githubissues.databinding.FragmentIssueDetailBinding
 import com.example.githubissues.model.Issue
+import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import java.util.*
 
@@ -42,12 +44,13 @@ class IssueDetailFragment : Fragment() {
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(MainViewModel::class.java)
 
         id?.let {
-            viewModel.getIssueDetails(it)
-            binding.showIssueDetails(viewModel.currentIssueDetails.value)
+            viewModel.fgetIssueDetails(it)
         } ?: binding.showPlaceholder()
 
-        viewModel.currentIssueDetails.observe(viewLifecycleOwner) {
-            binding.showIssueDetails(viewModel.currentIssueDetails.value)
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.fcurrentIssueDetails.collectLatest {
+                binding.showIssueDetails(it)
+            }
         }
 
         return binding.root

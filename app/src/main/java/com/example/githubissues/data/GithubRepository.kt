@@ -10,6 +10,7 @@ import com.example.githubissues.db.RemoteKeys
 import com.example.githubissues.model.Issue
 import com.example.githubissues.model.IssueState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import timber.log.Timber
 
 /**
@@ -54,6 +55,10 @@ class GithubRepository(
 
     suspend fun getIssueDetails(issueId: Long): Issue {
         return database.issuesDao().getIssueDetailsById(issueId)
+    }
+
+    suspend fun fgetIssueDetails(issueId: Long): Issue {
+        return database.issuesDao().fgetIssueDetailsById(issueId)
     }
 
     suspend fun deselectLastSelectedIssue() {

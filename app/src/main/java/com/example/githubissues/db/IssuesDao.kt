@@ -28,6 +28,9 @@ interface IssuesDao {
 //    fun getAllIssuesNoDetailsAllStates(): PagingSource<Int, Issue>
 
     @Query("SELECT * FROM issues WHERE id = :id")
+    suspend fun fgetIssueDetailsById(id: Long): Issue
+
+    @Query("SELECT * FROM issues WHERE id = :id")
     suspend fun getIssueDetailsById(id: Long): Issue
     // Don't remove selected issues until they became deselected
     @Query("DELETE FROM issues WHERE state = :state AND isSelected = 0")
