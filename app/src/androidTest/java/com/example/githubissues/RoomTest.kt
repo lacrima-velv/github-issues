@@ -1,9 +1,6 @@
 package com.example.githubissues
 
-import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.githubissues.db.IssuesDao
@@ -12,7 +9,6 @@ import com.example.githubissues.db.RemoteKeys
 import com.example.githubissues.db.RemoteKeysDao
 import com.example.githubissues.model.Issue
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -57,15 +53,13 @@ class RoomTest {
     private val remoteKeyOfUnselectedIssue = RemoteKeys(
         issueId = 1,
         prevKey = 1,
-        nextKey = 2,
-        issueState = "Open"
+        nextKey = 2
     )
 
     private val remoteKeyOfSelectedIssue = RemoteKeys(
         issueId = 2,
         prevKey = 3,
-        nextKey = 4,
-        issueState = "Closed"
+        nextKey = 4
     )
 
     @Before

@@ -10,7 +10,6 @@ import com.example.githubissues.db.RemoteKeys
 import com.example.githubissues.model.Issue
 import com.example.githubissues.model.IssueState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import timber.log.Timber
 
 /**
@@ -57,23 +56,15 @@ class GithubRepository(
         return database.issuesDao().getIssueDetailsById(issueId)
     }
 
-    suspend fun fgetIssueDetails(issueId: Long): Issue {
-        return database.issuesDao().fgetIssueDetailsById(issueId)
-    }
-
     suspend fun deselectLastSelectedIssue() {
         return database.issuesDao().deselectLastSelectedIssue()
     }
 
     suspend fun setIssueSelected(id: Long) {
-        Timber.d("database.issuesDao().setIssueSelected(id) returned ${database.issuesDao().setIssueSelected(id)}")
+        Timber.d("database.issuesDao().setIssueSelected(id) returned " +
+                "${database.issuesDao().setIssueSelected(id)}")
         return database.issuesDao().setIssueSelected(id)
     }
-
-//    suspend fun checkIsIssueSelected(id: Long): Int {
-//        Timber.d("database.issuesDao().checkIsIssueSelected(id) returned ${database.issuesDao().checkIsIssueSelected(id)}")
-//        return database.issuesDao().checkIsIssueSelected(id)
-//    }
 
     private fun getNextPageKeyForWorker(pageNum: Int) =
         when (pageNum) {
@@ -100,7 +91,7 @@ class GithubRepository(
                         issue.id,
                         getPreviousKeyForWorker(pageNum),
                         getNextPageKeyForWorker(pageNum)
-                        )
+                    )
                     )
                 }
                 database.remoteKeysDao().insertAll(remoteKeys)

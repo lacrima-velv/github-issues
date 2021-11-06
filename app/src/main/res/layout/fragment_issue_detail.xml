@@ -14,26 +14,25 @@
         android:layout_height="wrap_content">
 
         <TextView
+            style="@style/IssueTitleText"
             android:id="@+id/issue_details_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_on_sides"
             android:layout_marginTop="@dimen/margin_on_sides"
             android:layout_marginEnd="@dimen/margin_on_sides"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Throwing retrofit2.HttpException 500 Internal Server Error" />
 
         <TextView
+            style="@style/IssueMetadataText"
             android:id="@+id/issue_details_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_on_sides"
             android:layout_marginTop="@dimen/margin_between_elements"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             app:layout_constraintEnd_toStartOf="@+id/issue_details_state"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
@@ -41,23 +40,22 @@
             tools:text="#1234" />
 
         <TextView
+            style="@style/IssueMetadataText"
             android:id="@+id/issue_details_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_between_elements"
             android:layout_marginEnd="@dimen/margin_on_sides"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/issue_details_number"
             app:layout_constraintTop_toBottomOf="@+id/issue_details_title"
             tools:text="State: Open" />
 
         <TextView
+            style="@style/IssueDescriptionText"
             android:id="@+id/issue_details_body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
             android:layout_marginStart="@dimen/margin_on_sides"
             android:layout_marginTop="@dimen/margin_between_elements"
             android:layout_marginEnd="@dimen/margin_on_sides"
@@ -72,11 +70,10 @@
 	    at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)" />
 
         <TextView
+            style="@style/IssueMetadataText"
             android:id="@+id/issue_details_posted_by"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginStart="@dimen/margin_on_sides"
             app:layout_constraintBottom_toBottomOf="@id/issue_details_author_avatar"
             app:layout_constraintStart_toStartOf="parent"
@@ -97,11 +94,10 @@
             tools:src="@drawable/ic_user_placeholder" />
 
         <TextView
+            style="@style/IssueMetadataText"
             android:id="@+id/issue_details_author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginStart="@dimen/margin_between_elements"
             android:ellipsize="end"
             android:maxLines="1"
@@ -111,11 +107,10 @@
             tools:text="Maxim Alexandrov" />
 
         <TextView
+            style="@style/IssueMetadataText"
             android:id="@+id/issue_details_assigned_to"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginStart="@dimen/margin_on_sides"
             app:layout_constraintBottom_toBottomOf="@id/issue_details_assignee_avatar"
             app:layout_constraintStart_toStartOf="parent"
@@ -136,11 +131,10 @@
             tools:src="@drawable/ic_user_placeholder" />
 
         <TextView
+            style="@style/IssueMetadataText"
             android:id="@+id/issue_details_assignee"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginStart="@dimen/margin_between_elements"
             android:ellipsize="end"
             android:maxLines="1"
@@ -150,11 +144,10 @@
             tools:text="Maxim Alexandrov" />
 
         <TextView
+            style="@style/IssueMetadataText"
             android:id="@+id/issue_details_updated"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginStart="@dimen/margin_on_sides"
             android:layout_marginTop="@dimen/margin_between_elements"
             app:layout_constraintStart_toStartOf="parent"
@@ -162,11 +155,10 @@
             android:text="@string/updated" />
 
         <TextView
+            style="@style/IssueMetadataText"
             android:id="@+id/issue_details_updated_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginTop="@dimen/margin_between_elements"
             android:layout_marginStart="@dimen/margin_between_elements"
             app:layout_constraintStart_toStartOf="@+id/guideline"
@@ -174,11 +166,10 @@
             tools:text="2 days ago" />
 
         <TextView
+            style="@style/IssueMetadataText"
             android:id="@+id/issue_details_created"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginStart="@dimen/margin_on_sides"
             android:layout_marginTop="@dimen/margin_between_elements"
             app:layout_constraintStart_toStartOf="parent"
@@ -186,11 +177,10 @@
             android:text="@string/created" />
 
         <TextView
+            style="@style/IssueMetadataText"
             android:id="@+id/issue_details_created_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginTop="@dimen/margin_between_elements"
             android:layout_marginStart="@dimen/margin_between_elements"
             app:layout_constraintStart_toStartOf="@+id/guideline"
@@ -206,8 +196,8 @@
 
         <ImageView
             android:id="@+id/empty_issue_details_placeholder_image"
-            android:layout_width="@dimen/empty_list_placeholder_image_width"
-            android:layout_height="@dimen/empty_list_placeholder_image_height"
+            android:layout_width="@dimen/empty_issue_details_placeholder_image_width"
+            android:layout_height="@dimen/empty_issue_details_placeholder_image_height"
             android:src="@drawable/ic_empty_issue_details"
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/empty_issue_details_placeholder_text"

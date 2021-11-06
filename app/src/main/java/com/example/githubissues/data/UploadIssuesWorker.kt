@@ -34,7 +34,7 @@ class UploadIssuesWorker(
                     "uploadIssuesWorkRequest",
                     ExistingPeriodicWorkPolicy.KEEP,
                     PeriodicWorkRequestBuilder<UploadIssuesWorker>(PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
-                        //.setInitialDelay(5, TimeUnit.MINUTES)
+                        .setInitialDelay(3, TimeUnit.MINUTES)
                         .setConstraints(
                             Constraints.Builder()
                                 .setRequiredNetworkType(NetworkType.CONNECTED)

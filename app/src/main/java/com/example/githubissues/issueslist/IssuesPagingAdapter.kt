@@ -73,7 +73,7 @@ class IssuesPagingAdapter(
         Timber.d("Position is $position")
         val issueInList = getItem(position)
         if (issueInList != null) {
-                holder.bind(issueInList)
+            holder.bind(issueInList)
         }
     }
 

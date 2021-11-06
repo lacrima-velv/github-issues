@@ -1,11 +1,7 @@
 package com.example.githubissues
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
+import androidx.appcompat.app.AppCompatActivity
 import com.example.githubissues.databinding.ActivityMainBinding
 import timber.log.Timber
 
@@ -25,11 +21,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
-    fun getToolbarTitle(): String {
-        return binding.toolbar?.title.toString()
-    }
-
-    // Used for sliding two panes layout
+    // Used during sliding two panes layout
     fun changeToolbarTitle(title: String) {
         binding.toolbar?.title = title
     }

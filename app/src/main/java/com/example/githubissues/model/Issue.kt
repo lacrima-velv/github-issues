@@ -8,10 +8,8 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "issues")
 data class Issue(
     @PrimaryKey val id: Long,
-    //val url: String,
     @Embedded val user: User?,
     @Embedded val assignee: Assignee?,
-    //@SerializedName("html_url")
     val number: Long?,
     val title: String?,
     val state: String?,

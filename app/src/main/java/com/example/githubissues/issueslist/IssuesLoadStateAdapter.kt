@@ -18,17 +18,14 @@ class IssuesLoadStateAdapter(private val retry: () -> Unit) :
     inner class IssuesLoadStateViewHolder(
         binding: IssuesLoadStateFooterHeaderViewItemBinding,
         retry: () -> Unit) : RecyclerView.ViewHolder(binding.root) {
-            init {
-                // We need to bind the root layout with our binder for external layout
-                errorRetryViewBinding = ErrorRetryViewBinding.bind(binding.root)
-                progressViewBinding = ProgressViewBinding.bind(binding.root)
+        init {
+            // We need to bind the root layout with our binder for external layout
+            errorRetryViewBinding = ErrorRetryViewBinding.bind(binding.root)
+            progressViewBinding = ProgressViewBinding.bind(binding.root)
 
-                errorRetryViewBinding.retryButton.setOnClickListener { retry() }
-            }
+            errorRetryViewBinding.retryButton.setOnClickListener { retry() }
+        }
         fun bind(loadState: LoadState) {
-//            if (loadState is LoadState.Error) {
-//                errorRetryViewBinding.errorMsg.text = loadState.error.localizedMessage
-//            }
             progressViewBinding.progressBar.isVisible = loadState is LoadState.Loading
             errorRetryViewBinding.retryButton.isVisible = loadState is LoadState.Error
             errorRetryViewBinding.errorMsg.isVisible = loadState is LoadState.Error

@@ -41,14 +41,15 @@ class IssueDetailFragment : Fragment() {
 
         viewModelFactory =  MainViewModelFactory(Application(), this)
 
-        viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity(), viewModelFactory)
+            .get(MainViewModel::class.java)
 
         id?.let {
-            viewModel.fgetIssueDetails(it)
+            viewModel.getIssueDetails(it)
         } ?: binding.showPlaceholder()
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.fcurrentIssueDetails.collectLatest {
+            viewModel.currentIssueDetails.collectLatest {
                 binding.showIssueDetails(it)
             }
         }
@@ -107,13 +108,13 @@ class IssueDetailFragment : Fragment() {
 
             // If we got arguments, display issue's details
             issueDetailsState.text = getString(
-                R.string.issue_state, currentIssueDetails?.state?.replaceFirstChar {
+                R.string.issue_state, currentIssueDetails.state.replaceFirstChar {
                     if (it.isLowerCase()) it.titlecase(
                         Locale.getDefault()
                     ) else it.toString()
                 }
             )
-            issueDetailsNumber.text = getString(R.string.issue_number, currentIssueDetails?.number)
+            issueDetailsNumber.text = getString(R.string.issue_number, currentIssueDetails.number)
             issueDetailsAuthor.text = currentIssueDetails.user?.userLogin
             issueDetailsTitle.text = currentIssueDetails.title
 
