@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TabBar">
+        <item name="android:background">@color/orange_dark</item>
+        <item name="tabIndicatorColor">@color/blue_medium_night</item>
+        <item name="tabSelectedTextColor">@color/blue_medium_night</item>
+    </style>
+</resources>
