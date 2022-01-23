@@ -8,6 +8,7 @@
     <dimen name="issue_details_avatar_width">48dp</dimen>
     <dimen name="margin_on_sides">16dp</dimen>
     <dimen name="margin_between_elements">8dp</dimen>
+    <dimen name="small_padding">4dp</dimen>
     <dimen name="action_bar_size_w600dp">48dp</dimen>
     <dimen name="padding_around_progress_indicator">34dp</dimen>
 </resources>

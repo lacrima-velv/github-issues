@@ -59,6 +59,7 @@
             android:layout_marginStart="@dimen/margin_on_sides"
             android:layout_marginTop="@dimen/margin_between_elements"
             android:layout_marginEnd="@dimen/margin_on_sides"
+            android:paddingEnd="@dimen/small_padding"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/issue_details_number"
@@ -67,7 +68,8 @@
         but response body type was declared as non-null
 	    at retrofit2.KotlinExtensions$await$2$2.onResponse(KotlinExtensions.kt:43)
 	    at retrofit2.OkHttpCall$1.onResponse(OkHttpCall.java:161)
-	    at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)" />
+	    at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)"
+            tools:ignore="RtlSymmetry" />
 
         <TextView
             style="@style/IssueMetadataText"
