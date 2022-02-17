@@ -1,7 +1,5 @@
 package com.example.githubissues.issueslist
 
-import android.app.ActionBar
-import android.content.Context
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
@@ -15,20 +13,16 @@ class TwoPaneOnBackPressedCallback(
     private val slidingPaneLayout: SlidingPaneLayout,
     private val issuesListToolbarTitle: () -> Unit,
     private val issueDetailsToolbarTitle: () -> Unit
-    //private val isLayoutVertical: Boolean?
 ) :
     OnBackPressedCallback(
         /*
         Set the default 'enabled' state to true only if it is slidable (i.e., the panes
         are overlapping) and open (i.e., the detail pane is visible).
          */
-        //slidingPaneLayout.isSlideable && slidingPaneLayout.isOpen
-        //(slidingPaneLayout.isSlideable || isLayoutVertical == true) && slidingPaneLayout.isOpen
         slidingPaneLayout.isSlideable && slidingPaneLayout.isOpen
     ), SlidingPaneLayout.PanelSlideListener {
 
     init {
-        //Timber.d("slidingPaneLayout.isSlideable is ${slidingPaneLayout.isSlideable} isLayoutVertical is $isLayoutVertical slidingPaneLayout.isOpen is ${slidingPaneLayout.isOpen}")
         slidingPaneLayout.addPanelSlideListener(this)
     }
 

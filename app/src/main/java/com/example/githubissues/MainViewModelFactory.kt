@@ -4,10 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.savedstate.SavedStateRegistryOwner
-import com.example.githubissues.data.GithubRepository
-import java.lang.IllegalArgumentException
 
 class MainViewModelFactory(
     private val application: Application,

@@ -16,7 +16,6 @@
         android:theme="@style/Theme.GithubIssues"
         tools:ignore="UnusedAttribute">
         <activity
-
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

@@ -1,15 +1,7 @@
 package com.example.githubissues
 
-import android.app.Application
-import android.content.Context
 import android.content.res.Resources
 import android.text.format.DateUtils
-import android.util.TypedValue
-import androidx.lifecycle.ViewModelProvider
-import androidx.savedstate.SavedStateRegistryOwner
-import com.example.githubissues.api.GithubApiService
-import com.example.githubissues.data.GithubRepository
-import com.example.githubissues.db.IssuesDatabase
 import java.text.SimpleDateFormat
 import java.util.*
 

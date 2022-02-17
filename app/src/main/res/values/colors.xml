@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="orange_light">#ffd95a</color>
     <color name="orange_medium">#f9a825</color>
     <color name="orange_dark">#c17900</color>
+    <color name="orange_night">#885500</color>
     <color name="blue_medium">#5942a5f5</color>
+    <color name="blue_medium_night">#C5DEF3</color>
     <color name="blue_light">#1a42a5f5</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
     <color name="ic_launcher_background">#282828</color>
 </resources>

@@ -70,9 +70,10 @@ class IssuesPagingAdapter(
     }
 
     override fun onBindViewHolder(holder: IssueItemViewHolder, position: Int) {
+        Timber.d("Position is $position")
         val issueInList = getItem(position)
         if (issueInList != null) {
-                holder.bind(issueInList)
+            holder.bind(issueInList)
         }
     }
 

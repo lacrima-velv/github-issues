@@ -61,14 +61,10 @@ class GithubRepository(
     }
 
     suspend fun setIssueSelected(id: Long) {
-        Timber.d("database.issuesDao().setIssueSelected(id) returned ${database.issuesDao().setIssueSelected(id)}")
+        Timber.d("database.issuesDao().setIssueSelected(id) returned " +
+                "${database.issuesDao().setIssueSelected(id)}")
         return database.issuesDao().setIssueSelected(id)
     }
-
-//    suspend fun checkIsIssueSelected(id: Long): Int {
-//        Timber.d("database.issuesDao().checkIsIssueSelected(id) returned ${database.issuesDao().checkIsIssueSelected(id)}")
-//        return database.issuesDao().checkIsIssueSelected(id)
-//    }
 
     private fun getNextPageKeyForWorker(pageNum: Int) =
         when (pageNum) {
@@ -95,7 +91,7 @@ class GithubRepository(
                         issue.id,
                         getPreviousKeyForWorker(pageNum),
                         getNextPageKeyForWorker(pageNum)
-                        )
+                    )
                     )
                 }
                 database.remoteKeysDao().insertAll(remoteKeys)
